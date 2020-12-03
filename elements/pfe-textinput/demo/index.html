@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, minimum-scale=1.0, initial-scale=1.0, user-scalable=yes">
+    <title>PatternFly Element | pfe-textinput Demo</title>
+
+    <noscript>
+      <link href="../../pfelement/dist/pfelement-noscript.min.css" rel="stylesheet">
+    </noscript>
+
+    <link href="../../pfelement/dist/pfelement.min.css" rel="stylesheet">
+
+    <!-- Stylesheets for testing light DOM styles. -->
+    <!-- <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.3.1/css/bootstrap-reboot.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/typebase.css/0.5.0/typebase.css"> -->
+   
+    
+    <link rel="stylesheet" href="../../pfe-styles/dist/pfe-base.css" />
+    <link rel="stylesheet" href="../../pfe-styles/dist/pfe-context.css" />
+    <link rel="stylesheet" href="../../pfe-styles/dist/pfe-layouts.css" />
+
+    <!-- uncomment the es5-adapter if you're using the umd version -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/webcomponentsjs/2.3.0/custom-elements-es5-adapter.js"></script>
+    
+    <!-- Use webcomponents-loader when you are adding support for more modern browsers -->
+    <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/webcomponentsjs/2.3.0/webcomponents-loader.js"></script> -->
+
+    <!-- IE11 test: use bundle + require with umd files -->
+    <!-- Use webcomponents-bundle when supporting much older browsers like IE11 -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/webcomponentsjs/2.3.0/webcomponents-bundle.js"></script>
+
+    <!-- Tests require pulling in the UMD version of the files -->
+    <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.5/require.min.js"></script> -->
+
+    <!-- <script>require([
+      '../../pfe-band/dist/pfe-band.umd.js',
+      "../dist/pfe-textinput.umd.js"
+    ])</script>
+
+    <script type="module">
+      import "../../pfe-band/dist/pfe-band.js";
+      import "../dist/pfe-textinput.js";
+    </script> -->
+
+    <script defer src="../../pfelement/dist/pfelement.umd.js"></script>
+    <script defer src="../../pfe-band/dist/pfe-band.umd.js"></script>
+    <script defer src="../../pfe-button/dist/pfe-button.umd.js"></script>
+    <script defer src="../../pfe-cta/dist/pfe-cta.umd.js"></script>
+    <script defer src="../dist/pfe-textinput.umd.js"></script>
+
+    <style>
+      input {
+        background-color: yellow;
+        color: black;
+      }
+
+      .form {
+        max-width: 600px;
+      }
+
+      .form > div {
+        margin-bottom: 8px;
+      }
+
+      .form label {
+        display: inline-block;
+        width: 126px;
+      }
+
+      .form pfe-textinput {
+        width: 100%;
+      }
+
+      .form pfe-button {
+        position: relative;
+        left: 130px;
+      }
+
+      @media (min-width: 484px) {
+        .form pfe-textinput {
+          width: 320px;
+        }
+      }
+    </style>
+  </head>
+  <body unresolved>
+    <pfe-band pfe-color="lightest">
+      <h1><code>pfe-textinput</code></h1>
+
+      <h2>pfe-textinput Form</h2>
+      <form class="form" id="lightForm">
+        <div>
+          <label for="plain">Text input</label>
+          <pfe-textinput>
+            <input type="text" id="plain" placeholder="Text input" style="color: red !important">
+          </pfe-textinput>
+        </div>
+        <div>
+          <label for="text-required">Required input</label>
+          <pfe-textinput>
+            <input type="text" id="text-required" placeholder="Required" required>
+          </pfe-textinput>
+        </div>
+        <div>
+          <label for="text-disabled">Text disabled</label>
+          <pfe-textinput>
+            <input type="text" id="text-disabled" placeholder="Disabled" value="Disabled text input" disabled>
+          </pfe-textinput>
+        </div>
+        <pfe-button>
+          <button>Submit</button>
+        </pfe-button>
+      </form>
+    </pfe-band>
+    
+    <pfe-band>
+      <h2>pfe-textinput Types</h2>
+      <form class="form">
+        <div>
+          <label for="type-text">type="text"</label>
+          <pfe-textinput>
+            <input type="text" id="type-text" placeholder="text">
+          </pfe-textinput>
+        </div>
+        <div>
+          <label for="type-email">type="email"</label>
+          <pfe-textinput>
+            <input type="email" id="type-email" placeholder="email">
+          </pfe-textinput>
+        </div>
+        <div>
+          <label for="type-tel">type="tel"</label>
+          <pfe-textinput>
+            <input type="tel" id="type-tel" placeholder="tel">
+          </pfe-textinput>
+        </div>
+        <div>
+          <label for="type-search">type="search"</label>
+          <pfe-textinput>
+            <input type="search" id="type-search" placeholder="search">
+          </pfe-textinput>
+        </div>
+        <div>
+          <label for="type-url">type="url"</label>
+          <pfe-textinput>
+            <input type="url" id="type-url" placeholder="url">
+          </pfe-textinput>
+        </div>
+        <div>
+          <label for="type-password">type="password"</label>
+          <pfe-textinput>
+            <input type="password" id="type-password" placeholder="password">
+          </pfe-textinput>
+        </div>
+        <div>
+          <label for="disabled">Disabled</label>
+          <pfe-textinput>
+            <input type="text" id="disabled" placeholder="disabled" disabled>
+          </pfe-textinput>
+        </div>
+      </form>
+    </pfe-band>
+
+    <pfe-band pfe-color="lightest">
+      <h2>pfe-textinput States</h2>
+      <form class="form">
+        <div>
+          <label for="state-default">Default</label>
+          <pfe-textinput>
+            <input type="text" id="state-default" placeholder="Default">
+          </pfe-textinput>
+        </div>
+        <div>
+          <label for="state-invalid">Invalid</label>
+          <pfe-textinput class="pfe-invalid" novalidate>
+            <input type="text" id="state-invalid" placeholder="Invalid">
+          </pfe-textinput>
+        </div>
+        <div>
+          <label for="state-disabled">Disabled</label>
+          <pfe-textinput>
+            <input type="text" id="state-disabled" placeholder="Disabled" disabled>
+          </pfe-textinput>
+        </div>
+      </form>
+    </pfe-band>
+    
+    <pfe-band>
+      <h2>pfe-textinput Form</h2>
+      <form class="form" id="shadowForm">
+        <div>
+          <label for="firstName">First Name</label>
+          <pfe-textinput>
+            <input type="text" id="firstName" name="firstName" placeholder="First Name" required>
+          </pfe-textinput>
+        </div>
+        <div>
+          <label for="lastName">Last Name</label>
+          <pfe-textinput>
+            <input type="text" id="lastName" name="lastName" placeholder="Last Name" value="Einstein" required>
+          </pfe-textinput>
+        </div>
+        <div>
+          <label for="email">Email Address</label>
+          <pfe-textinput id="cityPfeTextInput">
+            <input type="email" id="email" name="email" placeholder="Email Address" required>
+          </pfe-textinput>
+        </div>
+        <div>
+          <label for="phone">Phone Number</label>
+          <pfe-textinput>
+            <input type="text" id="phone" name="phone" placeholder="Phone Number" disabled>
+          </pfe-textinput>
+        </div>
+        <pfe-button>
+          <button>Submit</button>
+        </pfe-button>
+      </form>
+    </pfe-band>
+
+    <pfe-band pfe-color="lightest">
+      <h2>pfe-textinput novalidate</h2>
+      <div>
+        <p>This form has a "novalidate" attribute added to it. This attribute should allow the form to submit without the validity checks being performed. You could also add a "formnovalidate" attribute to the button at the end of the form and it will have the same effect as "novalidate" on the form tag.</p>
+        <pfe-cta>
+          <a href="https://developer.mozilla.org/en-US/docs/Web/HTML/Element/form#attr-novalidate">Learn more about "novalidate"</a>
+        </pfe-cta>
+      </div>
+      <form novalidate id="novalidate" class="form">
+        <div>
+          <label for="novalidate-plain">Text input</label>
+          <pfe-textinput>
+            <input type="text" id="novalidate-plain" placeholder="Text input" required>
+          </pfe-textinput>
+        </div>
+        <div>
+          <label for="novalidate-required">Required input</label>
+          <pfe-textinput>
+            <input type="text" id="novalidate-required" placeholder="Required" required>
+          </pfe-textinput>
+        </div>
+        <div>
+          <label for="novalidate-email">Email</label>
+          <pfe-textinput>
+            <input type="email" id="novalidate-email" placeholder="Email" required>
+          </pfe-textinput>
+        </div>
+        <pfe-button>
+          <button>Submit</button>
+        </pfe-button>
+      </form>
+    </pfe-band>
+
+    <script>
+      var lightForm = document.querySelector("#lightForm");
+      lightForm.addEventListener("submit", function (event) {
+        event.preventDefault();
+        console.log("lightForm submitted");
+      });
+
+      var shadowForm = document.querySelector("#shadowForm");
+      shadowForm.addEventListener("submit", function (event) {
+        event.preventDefault();
+        console.log("shadowForm submitted");
+
+        for (var i = 0; i < this.elements.length; i++) {
+          var element = this.elements[i];
+          console.log(encodeURIComponent(element.name) + " = " + encodeURIComponent(element.value));
+        }
+      });
+
+      var plainInput = document.querySelector("#plain");
+      setTimeout(function () {
+        plainInput.value = "Something plain";
+      }, 4000);
+
+      var novalidateForm = document.querySelector("#novalidate");
+      novalidateForm.addEventListener("submit", function (event) {
+        event.preventDefault();
+        console.log("novalidate form submitted");
+      });
+    </script>
+    
+  </body>
+</html>

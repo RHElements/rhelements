@@ -1,0 +1,85 @@
+@import "../../pfe-sass/pfe-sass";
+
+$LOCAL: textinput;
+
+$LOCAL-VARIABLES: (
+  BackgroundColor: pfe-var(surface--lightest),
+  BackgroundColor--disabled: pfe-var(ui-disabled),
+  BorderColor: pfe-var(surface--border--lighter),
+  BorderBottomColor: pfe-var(surface--border--darker), // TODO: sync on this color #767676,
+  BorderBottomColor--hover: pfe-var(ui-accent),
+  BorderBottomColor--invalid: pfe-var(feedback--critical--lighter),
+  BorderRadius: pfe-var(ui--border-radius),
+  BorderBottomWidth--invalid: 2px,
+  Color: pfe-var(text),
+  FontSize: pfe-var(font-size),
+  Height: 36px,
+  Padding: 8px 6px,
+  Padding--invalid: 8px 32px 7px 6px,
+  icon: (
+    Top: calc(50% - 0.5rem),
+    Right: 0.5rem,
+    Width: 1rem,
+    Height: 1rem,
+  ),
+  svg: (
+    Fill--invalid: pfe-var(feedback--critical--lighter),
+  )
+);
+
+:host {
+  display: inline-block;
+  position: relative;
+}
+
+::slotted(input) {
+  box-sizing: border-box !important;
+  padding: pfe-local(Padding) !important;
+  border-radius: pfe-local(BorderRadius, $fallback: 0) !important;
+  border: pfe-var(ui--border-width) pfe-var(ui--border-style)  pfe-local(BorderColor) !important;
+  border-bottom-color: pfe-local(BorderBottomColor) !important;
+  background-color: pfe-local(BackgroundColor) !important;
+  font-size: pfe-local(FontSize) !important;
+  color: pfe-local(color) !important;
+  min-height: pfe-local(Height) !important;
+  font-family: pfe-var(font-family) !important;
+  width: 100% !important;
+}
+
+::slotted(input[type="search"]) {
+  -webkit-appearance: textfield !important;
+}
+
+::slotted(input:hover),
+::slotted(input:focus) {
+  border-bottom-color: pfe-local(BorderBottomColor--hover) !important;
+}
+
+::slotted(input[disabled]) {
+  background-color: pfe-local(BackgroundColor--disabled) !important;
+  cursor: not-allowed !important;
+  border: pfe-var(ui--border-width) pfe-var(surface--border-style) transparent !important;
+}
+
+:host(.pfe-invalid) ::slotted(input) {
+  padding: pfe-local(Padding--invalid) !important;
+  border-bottom-width: pfe-local(BorderBottomWidth--invalid) !important;
+  border-bottom-color: pfe-local(BorderBottomColor--invalid) !important;
+}
+
+.icon {
+  display: none;
+}
+
+:host(.pfe-invalid) .icon {
+  display: block;
+  position: absolute;
+  right: pfe-local(Right, $region: icon);
+  top: pfe-local(Top, $region: icon);
+  width: pfe-local(Width, $region: icon);
+  height: pfe-local(Height, $region: icon);
+
+  #svg {
+    fill: pfe-local(Fill--invalid, $region: svg); 
+  }
+}
