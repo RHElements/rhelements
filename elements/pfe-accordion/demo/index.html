@@ -22,18 +22,13 @@
   <link rel="stylesheet" href="../../pfe-styles/dist/pfe-context.css" />
   <link rel="stylesheet" href="../../pfe-styles/dist/pfe-layouts.css" />
 
-  <!-- uncomment the es5-adapter if you're using the umd version -->
-  <script src="https://unpkg.com/@webcomponents/webcomponentsjs@2.4.1/custom-elements-es5-adapter.js"></script>
-  <script src="https://unpkg.com/@webcomponents/webcomponentsjs@2.4.1/webcomponents-bundle.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.5/require.min.js"></script>
+  <link rel="stylesheet" href="../dist/pfe-accordion--lightdom.css" />
+  <script src="../dist/pfe-accordion--fallback.js"></script>
 
-  <script>
-    require([
-      '../dist/pfe-accordion.umd.js',
-      '../../pfe-band/dist/pfe-band.umd.js',
-      '../../pfe-cta/dist/pfe-cta.umd.js'
-    ])
-
+  <script type="module">
+    import PfeAccordion from '../dist/pfe-accordion.js';
+    import PfeBand from '../../pfe-band/dist/pfe-band.js';
+    import PfeCta from '../../pfe-cta/dist/pfe-cta.js';
   </script>
 
   <link href="demo.css" rel="stylesheet" />

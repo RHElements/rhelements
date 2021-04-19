@@ -354,5 +354,5 @@ ${fs
     watch(path.join(paths.source, "*"), series("build:nojs"));
   });
 
-  task("dev:nojs", parallel("build:nojs", "watch:nojs"));
+  task("dev:nojs", series("build:nojs", "watch:nojs"));
 };
