@@ -1,3 +1,7 @@
+# 1.6.1 (2021)
+
+- [](https://github.com/patternfly/patternfly-elements/commit/) fix: add cascading attributes with scope
+
 # 1.6.0 (2021-04-23)
 
 - [0a549f8](https://github.com/patternfly/patternfly-elements/commit/0a549f8c54037e01006063800e729d633b515f66) feat: JSDoc preview added for PFElement
@@ -13,7 +17,6 @@
 - [a1e4b67](https://github.com/patternfly/patternfly-elements/commit/a1e4b67ac012f5987e6cddf2cc7b532a135fa989) feat: Add CSS variable support for typography & background colors on tabs
 - [84cb0b1](https://github.com/patternfly/patternfly-elements/commit/84cb0b1ea257a33dc28954367e82771bb3e17a52) fix: Updated CSS to allow CSS custom properties to override dynamically calculated theme context
 - [bdc14f7](https://github.com/patternfly/patternfly-elements/commit/bdc14f7c5e0d1fa0bf23ec3911b7f0b745a310ea) feat: Add a new readtime component to display estimated time to read content
-
 
 # 1.4.0 (2021-03-30)
 
