@@ -102,7 +102,17 @@ jobs:
       - name: Install dependencies
         if: steps.cache.outputs.cache-hit != 'true'
         run: npm ci
+        # TODO: looking into how to to automatically update package-lock if ci fails
+        # run: npm ci || npm install
 
+      # - name: Update package-lock if necessary
+      #   run: |
+      #     git add package-lock.json
+      #     git config user.name github-actions
+      #     git config user.email github-actions@github.com
+      #     git commit -m "Auto update package-lock during `Build & test` action due to npm ci failure"
+      #     git push origin ${{ github.head_ref }}
+          
       - name: Build
         id: build
         run: npm run build
@@ -274,11 +284,12 @@ jobs:
         run: npm run build
 
       - name: Visual regression tests
+        id: vrt
         run: npm run e2e -- --verbose
 
       # Upload assets even if the e2e fails
       - name: Archive baseline images
-        if: always()
+        if: success() || failure()
         uses: actions/upload-artifact@v2
         with:
           name: visual-regression-snapshots
@@ -294,6 +305,47 @@ jobs:
         with:
           local-testing: stop
 
+      # Report on the results of the visual regression tests
+      # only if this is a pull request & the tests weren't skipped
+      # This will return pass or fail based on results + labels and can
+      # be used as a required test to ensure passing visual tests when needed
+      # https://github.com/marketplace/actions/test-reporter
+      - name: Report on results
+        if: always()
+        uses: dorny/test-reporter@v1
+        with:
+          # Name of the Check Run which will be created
+          name: 'Test report'
+          # Coma separated list of paths to test results
+          path: 'test/vrt-results/vrt-results.json'
+          # Format of test results
+          reporter: 'mocha-json'
+          # Limits which test suites are listed
+          list-suites: 'failed'
+          # Limits which test cases are listed
+          list-tests: 'failed'
+          # Limits number of created annotations with error message and stack trace captured during test execution.
+          # Must be less or equal to 50.
+          max-annotations: '50'
+          # Set action as failed if test report contains any failed test
+          fail-on-error: 'false'
+          # Personal access token used to interact with Github API
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Return success if passed or intentionally skipped
+        if: |
+          steps.vrt.outputs.exit_code == 0 || 
+          contains(github.event.pull_request.labels.*.name, 'skip vrt') || 
+          contains(github.event.pull_request.labels.*.name, 'skip e2e')
+        run: exit 0
+
+      - name: Return failure if failed and not skipped
+        if: |
+          steps.vrt.outputs.exit_code == 1 && 
+          !contains(github.event.pull_request.labels.*.name, 'skip vrt') && 
+          !contains(github.event.pull_request.labels.*.name, 'skip e2e')
+        run: exit 1
+        
   # Validate the build to master was successful; open an issue if not
   validate:
     name: Validate successful build on master
