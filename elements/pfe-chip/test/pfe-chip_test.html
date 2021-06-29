@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, minimum-scale=1.0, initial-scale=1.0, user-scalable=yes">
+    <script src="/components/@webcomponents/webcomponentsjs/webcomponents-bundle.js"></script>
+    <script src="/components/web-component-tester/browser.js"></script>
+    <script type="module" src="../dist/pfe-chip.js"></script>
+  </head>
+  <body>
+    <pfe-chip>
+      <!-- Default slot -->
+      <h2>This is pfe-chip</h2>
+      <!-- Named slots -->
+      <div slot="pfe-chip--badge">7</div>
+    </pfe-chip>
+
+    <!-- Preview different properties -->
+    <pfe-chip pfe-read-only>
+      <h2>This is pfe-chip</h2>
+      <div slot="badge">BADGE slot</div>
+    </pfe-chip>
+
+    <pfe-chip pfe-overflow="4">
+      <h2>This is pfe-chip</h2>
+      <div slot="badge">BADGE slot</div>
+    </pfe-chip>
+
+    <pfe-chip pfe-badge="7">
+      <h2>This is pfe-chip</h2>
+      <div slot="badge">BADGE slot</div>
+    </pfe-chip>
+
+    <script>
+      const elements = [...document.querySelectorAll("pfe-chip")];
+
+      suite("<pfe-chip>", () => {
+        test("it should upgrade", () => {
+          assert.instanceOf(
+            document.querySelector("pfe-chip"),
+            customElements.get("pfe-chip"),
+            "pfe-chip should be an instance of pfeChip"
+          );
+        });
+
+        // Write tests for each attribute
+        test("pfe-read-only attribute is applied correctly", () => {
+          // Test that the attribute applied correctly
+          // assert.equal();
+        });
+        test("pfe-overflow attribute is applied correctly", () => {
+          // Test that the attribute applied correctly
+          // assert.equal();
+        });
+        test("pfe-badge attribute is applied correctly", () => {
+          // Test that the attribute applied correctly
+          // assert.equal();
+        });
+
+        // Write tests for each slot
+        test("badge slot is working correctly", () => {
+          // Test that the attribute applied correctly
+          // assert.equal();
+        });
+
+      });
+    </script>
+  </body>
+</html>

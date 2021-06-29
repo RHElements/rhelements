@@ -1,0 +1,13 @@
+<slot hidden aria-hidden="true"></slot>
+
+${this.overflow ? `<button class="pfe-chip__button" type="button" aria-labelledby="chip">` : ""}
+  <span class="pfe-chip__text" id="chip" aria-hidden="true"></span>
+  ${this.hasSlot("pfe-chip--badge") ? `<pfe-badge class="pfe-chip__badge">
+    <slot name="pfe-chip--badge"></slot>
+  </pfe-badge>` : ""}
+  ${this.overflow ? `</button>` : ""}
+
+${this.showCloseButton ? `<button class="pfe-chip__close" type="button" aria-labelledby="remove_chip"
+  aria-label="Remove" id="remove_chip">
+  <pfe-icon icon="fas-times"></pfe-icon>
+</button>` : ""}

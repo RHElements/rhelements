@@ -333,7 +333,11 @@ export const autoContentKnobs = slots => {
   let binding = {};
 
   Object.entries(slots).forEach(slot => {
-    binding[slot[0]] = bridge.text(slot[1].title, slot[1].default, "Content");
+    if (slot[1].type === "number") {
+      binding[slot[0]] = bridge.number(slot[1].title, slot[1].default, {}, "Content");
+    } else {
+      binding[slot[0]] = bridge.text(slot[1].title, slot[1].default, "Content");
+    }
   });
 
   return binding;

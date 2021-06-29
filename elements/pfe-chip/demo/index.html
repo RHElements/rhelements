@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, minimum-scale=1.0, initial-scale=1.0, user-scalable=yes">
+    <title>PatternFly Element | pfe-chip Demo</title>
+
+    <noscript>
+      <link href="../../pfelement/dist/pfelement-noscript.min.css" rel="stylesheet">
+    </noscript>
+
+    <link href="../../pfelement/dist/pfelement.min.css" rel="stylesheet">
+
+    <!-- Stylesheets for testing light DOM styles.
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.3.1/css/bootstrap-reboot.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/typebase.css/0.5.0/typebase.css">
+    -->
+    
+    <link rel="stylesheet" href="../../pfe-styles/dist/pfe-base.css" />
+    <link rel="stylesheet" href="../../pfe-styles/dist/pfe-context.css" />
+    <link rel="stylesheet" href="../../pfe-styles/dist/pfe-layouts.css" />
+
+    <!-- uncomment the es5-adapter if you're using the umd version -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/webcomponentsjs/2.3.0/custom-elements-es5-adapter.js"></script>
+    
+    <!-- Use webcomponents-loader when you are adding support for more modern browsers -->
+    <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/webcomponentsjs/2.3.0/webcomponents-loader.js"></script> -->
+
+    <!-- IE11 test: use bundle + require with umd files -->
+    <!-- Use webcomponents-bundle when supporting much older browsers like IE11 -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/webcomponentsjs/2.3.0/webcomponents-bundle.js"></script>
+
+    <!-- Tests require pulling in the UMD version of the files -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.5/require.min.js"></script>
+
+    <script>require([
+      "../dist/pfe-chip.umd.js",
+      "../../pfe-band/dist/pfe-band.umd.js",
+      "../../pfe-card/dist/pfe-card.umd.js",
+      "../../pfe-cta/dist/pfe-cta.umd.js"
+    ])</script>
+
+    <style>
+      .card-layout {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        gap: 15px;
+      }
+      .chip-layout {
+        display: flex;
+        flex-flow: row wrap;
+        align-items: flex-start;
+        margin: -5px;
+      }
+
+      .chip-layout > * {
+        margin: 5px;
+      }
+
+      pfe-band {
+        --pfe-band--Padding--vertical: 20px;
+        --pfe-band--Padding--horizontal: 20px;
+        --pfe-band--Width: auto;
+      }
+
+      button {
+        padding: 10px;
+      }
+    </style>
+  </head>
+
+  <body unresolved>
+    <pfe-band color="complement" style="--pfe-band--Padding--vertical: 10px;">
+      <h1 slot="pfe-band--header"><code>pfe-chip</code></h1>
+    </pfe-band>
+
+    <pfe-band color="lightest">
+      <div class="card-layout">
+        <pfe-card color="lightest" style="--pfe-card--Border: 1px solid #ddd;">
+          <h2 slot="pfe-card--header">Light theme chips</h2>
+          <div class="chip-layout">
+            <pfe-chip>Chip</pfe-chip>
+            <pfe-chip>Really long chip that goes on and on</pfe-chip>
+            <pfe-chip>Chip <span slot="badge">7</span></pfe-chip>
+            <pfe-chip badge="2">Chip</pfe-chip>
+            <pfe-chip read-only>Read-only chip</pfe-chip>
+            <pfe-chip overflow="4">
+              <button>4 more</button>
+            </pfe-chip>
+          </div>
+          <br>
+          <button disabled type="reset" value="Reset" slot="pfe-card--footer">Reset</button>
+        </pfe-card>
+        <pfe-card color="darkest">
+          <h2 slot="pfe-card--header">Dark theme chips</h2>
+          <div class="chip-layout">
+            <pfe-chip>Chip</pfe-chip>
+            <pfe-chip>Really long chip that goes on and on</pfe-chip>
+            <pfe-chip>Chip <span slot="badge">7</span></pfe-chip>
+            <pfe-chip badge="2">Chip</pfe-chip>
+            <pfe-chip read-only>Read-only chip</pfe-chip>
+            <pfe-chip overflow="6">
+              <button>6 more</button>
+            </pfe-chip>
+          </div>
+          <br>
+          <button disabled type="reset" value="Reset" slot="pfe-card--footer">Reset</button>
+        </pfe-card>
+        <pfe-card color="accent">
+          <h2 slot="pfe-card--header">Saturated theme chips</h2>
+          <div class="chip-layout">
+            <pfe-chip>Chip</pfe-chip>
+            <pfe-chip>Really long chip that goes on and on</pfe-chip>
+            <pfe-chip>Chip <span slot="badge">7</span></pfe-chip>
+            <pfe-chip badge="2">Chip</pfe-chip>
+            <pfe-chip read-only>Read-only chip</pfe-chip>
+            <pfe-chip overflow="2">
+              <button>2 more</button>
+            </pfe-chip>
+          </div>
+          <br>
+          <button disabled type="reset" value="Reset" slot="pfe-card--footer">Reset</button>
+        </pfe-card>
+      </div>
+    </pfe-band>
+
+    <script>
+      // Add back chips
+      function showChips(chips) {
+          chips.forEach(function(chip) {
+            // Delete the new chips, show the original ones
+            if (chip.id.includes("new-chip")) {
+              chip.delete();
+            } else {
+              chip.show();
+            }
+          });
+      }
+
+      // Test the chip close event
+      document.addEventListener("pfe-chip:close", function (event) {
+        // Use the pfe-chip hide function
+        event.target.hide();
+
+        // Get the reset button in the card and enable it
+        var button = event.target.parentNode.parentNode.querySelector("button[value=\"Reset\"]");
+        if (button.hasAttribute("disabled")) button.removeAttribute("disabled");
+      });
+
+      // Test the chip load more event
+      document.addEventListener("pfe-chip:load", function (event) {
+        var container = event.target.parentNode;
+        var count = event.target.getAttribute("overflow");
+
+        // Add the appropriate number of new chips to the stack
+        for (i = 0; i < count; i++) {
+          var newChip = document.createElement("pfe-chip");
+          newChip.innerText = "New chip " + (i + 1);
+          newChip.setAttribute("id", "new-chip-" + (i + 1));
+          container.appendChild(newChip);
+        }
+
+        // Use the pfe-chip hide function
+        event.target.hide();
+
+        // Get the reset button in the card and enable it
+        var button = event.target.parentNode.parentNode.querySelector("button[value=\"Reset\"]");
+        if (button.hasAttribute("disabled")) button.removeAttribute("disabled");
+      });
+
+      // Get the reset buttons
+      var resets = document.querySelectorAll("button[value=\"Reset\"]");
+      resets.forEach(function(reset) {
+        // Add a click event listener to each
+        reset.addEventListener("click", function (event) {
+          // Add back chips when reset is clicked
+          showChips(event.target.parentNode.querySelectorAll("pfe-chip"));
+          // Disable the reset button
+          event.target.setAttribute("disabled", "");
+        });
+        
+        reset.addEventListener("keyup", function (event) {
+          var key = event.key || event.keyCode;
+          switch (key) {
+            case "Enter":
+            case 13:
+              // Add back chips when reset is clicked
+              showChips(event.target.parentNode.querySelectorAll("pfe-chip"));
+              // Disable the reset button
+              event.target.setAttribute("disabled", "");
+          }
+        });
+      });
+    </script>
+    
+  </body>
+</html>
