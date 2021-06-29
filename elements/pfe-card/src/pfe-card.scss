@@ -14,7 +14,8 @@ $LOCAL-VARIABLES: (
 
   //-- Color properties
   BackgroundColor: pfe-var(surface--base),
-  context: pfe-var(surface--base--context),
+  context: var(--theme, #{pfe-var(surface--base--context)}),
+
   BackgroundPosition: center center,
 
   spacing: pfe-var(container-spacer),
@@ -50,6 +51,15 @@ $size-small: (
   PaddingLeft:    pfe-var(container-spacer)
 );
 
+$size-none: (
+  PaddingTop:     0,
+  PaddingRight:   0,
+  PaddingBottom:  0,
+  PaddingLeft:    0
+);
+
+// Pull in pfe-var settings for all supported surface colors
+@include pfe-surfaces;
 
 :host {
   --context: #{pfe-local(context)};
@@ -93,13 +103,21 @@ $size-small: (
   }
 }
 
-// Pull in pfe-var settings for all supported surface colors
-@include pfe-surfaces;
-
 @include pfe-contexts; // imports on="light" etc support
+
+:host(:not([color])),
+:host([color=""]),
+:host([color="transparent"]) {
+  background-color: transparent;
+  --context: var(--pfe-card--context, var(--theme));
+}
 
 :host([size="small"]) {
   @include pfe-print-local($size-small);
+}
+
+:host([size="none"]) {
+  @include pfe-print-local($size-none);
 }
 
 :host([border]:not([border="false"])) {
@@ -173,6 +191,14 @@ $size-small: (
       width: calc(100% + 4rem) !important; //IE11 fallback
       width: calc(100% + #{pfe-local(PaddingRight)} + #{pfe-local(PaddingLeft)}) !important;
     }
+
+    ::slotted([first]) {
+      margin-top: 0 !important;
+    }
+
+    ::slotted([last]) {
+      margin-bottom: 0 !important;
+    }
   }
   &__header {
     z-index: 2;
@@ -183,6 +209,13 @@ $size-small: (
         // Declare the header background color
       background-color: pfe-local(BackgroundColor--dark, $region: header);
     }
+    
+    :host(:not([color])) &,
+    :host([color=""]) &,
+    :host([color="transparent"]) & {
+      background-color: transparent;
+    }
+
     @include browser-query(ie11) {
       background-color: pfe-fetch(surface--lightest) !important;
       color: pfe-fetch(text) !important;
@@ -222,14 +255,10 @@ $size-small: (
     ::slotted([overflow~="bottom"]) {
       --pfe-card__overflow--MarginBottom: calc(#{pfe-local(PaddingBottom)} * -1);
     }
-
-    @each $tag in (h1, h2, h3, h4, h5, h6) {
-      ::slotted(#{$tag}) {
-        margin-bottom: 0;
-      }
-    }
   }
   &__body {
+    margin-bottom: pfe-local(spacing--vertical);
+
     :host(:not([has_header])) & ::slotted([pfe-overflow~="top"]),
     :host(:not([has_header])) & ::slotted([overflow~="top"]) {
       --pfe-card__overflow--MarginTop: calc(#{pfe-local(PaddingTop)} * -1);
@@ -271,19 +300,6 @@ $size-small: (
 
     :host(:not([has_footer])) & {
       display: none;
-    }
-  }
-  &__header,
-  &__body {
-    margin-bottom: pfe-local(spacing--vertical);
-
-    //-- Slotted styles for typography
-    // Remove margins from typography inside the slots
-    @each $tag in (p, h1, h2, h3, h4, h5, h6) {
-      ::slotted(#{$tag}:first-child) {
-        // Remove top margins
-        margin-top: 0;
-      }
     }
   }
 }

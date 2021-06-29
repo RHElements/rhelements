@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, minimum-scale=1.0, initial-scale=1.0, user-scalable=yes">
+
+  <title>PatternFly Element: Band test page</title>
+  <meta name="description"
+    content="PatternFly Elements. A set of community-created web components based on PatternFly design.">
+  <link href="/brand/logo/svg/pfe-icon-blue.svg" rel="shortcut icon">
+
+  <link rel="stylesheet" type="text/css" href="//overpass-30e2.kxcdn.com/overpass.css">
+
+  <link rel="preconnect" href="https://fonts.gstatic.com">
+  <link href="https://fonts.googleapis.com/css2?family=Red+Hat+Display:wght@400;700&family=Red+Hat+Text&display=swap"
+    rel="stylesheet">
+
+  <!-- Stylesheets for testing light DOM styles.
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.3.1/css/bootstrap-reboot.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/typebase.css/0.5.0/typebase.css">
+    -->
+
+  <link rel="stylesheet" href="../../pfe-styles/dist/pfe-base.css" />
+  <link rel="stylesheet" href="../../pfe-styles/dist/pfe-context.css" />
+  <link rel="stylesheet" href="../../pfe-styles/dist/pfe-layouts.css" />
+
+  <noscript>
+    <link href="../../pfelement/dist/pfelement--noscript.min.css" rel="stylesheet">
+  </noscript>
+
+  <link href="../../pfelement/dist/pfelement.min.css" rel="stylesheet">
+
+  <!-- uncomment the es5-adapter if you're using the umd version -->
+  <script src="/examples/node_modules/@webcomponents/webcomponentsjs/custom-elements-es5-adapter.js"></script>
+  <script src="/examples/node_modules/@webcomponents/webcomponentsjs/webcomponents-bundle.js"></script>
+
+  <!-- Polyfill the fetch and promises -->
+  <script src="/examples/node_modules/whatwg-fetch/dist/fetch.umd.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/promise-polyfill@8/dist/polyfill.min.js"></script>
+
+  <style>
+    [class^="text-block"] {
+      display: inline-block;
+      background: #ddd;
+      min-width: 50%;
+      width: 80ch;
+      max-width: 100%;
+      height: 1em;
+      line-height: 1.5;
+    }
+
+    .text-block-tail {
+      min-width: 20%;
+      width: 50ch;
+      max-width: 60%;
+    }
+
+  </style>
+
+  <script src="/examples/node_modules/requirejs/require.js"></script>
+  <script>
+    require([
+      "../dist/pfe-band.umd.js",
+      "../../pfe-card/dist/pfe-card.umd.js",
+      "../../pfe-cta/dist/pfe-cta.umd.js"
+    ], function (PfeBand) {
+      // @POLYFILL Object.entries
+      if (!Object.entries) {
+        Object.entries = function (obj) {
+          var ownProps = Object.keys(obj),
+            i = ownProps.length,
+            resArray = new Array(i); // preallocate the Array
+          while (i--)
+            resArray[i] = [ownProps[i], obj[ownProps[i]]];
+
+          return resArray;
+        };
+      }
+
+      // Collect the properties from the component
+      var props = PfeBand._cache.componentProperties;
+      var attrs = {};
+      Object.entries(props).forEach(function ([key, value]) {
+        var newProps = value;
+        newProps.isAlias = false;
+
+        // If this is an alias, copy the properties from it's alias counterpart
+        if (typeof value.alias !== undefined) {
+          newProps = props[value.alias];
+          newProps.isAlias = true;
+        }
+
+        // Add an entry to the attrs object for this new properties object
+        // using the attribute name as the key
+        attrs[PfeBand._cache.prop2attr[key]] = newProps;
+      });
+
+      // Fetch the template
+      fetch("../src/template.html")
+        .then(function (response) {
+          return response.text();
+        })
+        .then(function (html) {
+          // Convert the returned string into an HTML node
+          var range = document.createRange();
+          var fragment = range.createContextualFragment(html);
+          var template = fragment.querySelector("template");
+          var clone = template.content.firstElementChild.cloneNode(true);
+
+          // Iterate over the supported attributes and generate an example for each one
+          var iterator = 0;
+          for (var [key, data] of Object.entries(attrs)) {
+            if (data.values && data.values.length > 0) {
+              var isAlias = data.alias || false;
+              data.values.forEach(value => {
+                clone.setAttribute(key, value);
+
+                // Sets up a striped visual for properties other than color
+                if (!key.includes("color") && iterator % 2) {
+                  clone.setAttribute("color", "base");
+                }
+
+                // Set the heading to the primary attribute being tested here
+                clone.querySelector("code").textContent = `${key}="${value}"`;
+
+                if ((key.includes("color") && value === "lightest") || (!key.includes("color") && !(
+                    iterator %
+                    2))) {
+                  clone.querySelector("pfe-card").setAttribute("border", "");
+                }
+
+                document.body.appendChild(clone);
+
+                clone = template.content.firstElementChild.cloneNode(true);
+                iterator = iterator + 1;
+              });
+            }
+          }
+        })
+        .catch(function (err) {
+          // There was an error
+          console.warn(err);
+        });
+    });
+
+  </script>
+</head>
+
+<body unresolved></body>
+
+</html>

@@ -54,7 +54,7 @@ class PfeBand extends PFElement {
         attr: "pfe-color",
       },
       asideDesktop: {
-        title: "side positioning (desktop)",
+        title: "Aside positioning (desktop)",
         type: String,
         values: ["right", "left"],
         default: "right",
@@ -89,7 +89,7 @@ class PfeBand extends PFElement {
       size: {
         title: "Padding size",
         type: String,
-        values: ["small"],
+        values: ["small", "none"],
       },
       // @TODO: Deprecated property in 1.0
       oldSize: {
