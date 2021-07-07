@@ -68,6 +68,10 @@ inquirer
     // Get the labels from the template
     let labels = get_labels(`./.github/PULL_REQUEST_TEMPLATE/${answers.template}`) || [];
 
-    open(`https://github.com/patternfly/patternfly-elements/compare/${answers.base_branch ||
-    "master"}...${answers.pr_branch || branch.sync()}?template=${answers.template}&labels=${encodeURIComponent(labels.join(","))}`);
+    open(
+      `https://github.com/patternfly/patternfly-elements/compare/${answers.base_branch ||
+        "master"}...${answers.pr_branch || branch.sync()}?template=${answers.template}&labels=${encodeURIComponent(
+        labels.join(",")
+      )}`
+    );
   });

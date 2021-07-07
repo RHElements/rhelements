@@ -1,642 +1,653 @@
-@import "../../pfe-sass/pfe-sass";
-@import "_shared-assets.scss";
-@import "../../pfe-styles/src/layouts/_grid";
+@import "sass-includes/variables-mixins";
+$pfe-navigation-id: 'pfe-navigation'!default;
 
-#main-menu {
-    background: transparent !important; // Remove this.
+/// @note Overridden collapse mixin to update selectors for light dom
+@mixin collapse($section) {
+  @if $section == 'nav' {
+    .pfe-navigation--collapse-main-menu & {
+      @content;
+    }
+  }
+  @else if $section == 'secondary-links' {
+    .pfe-navigation--collapse-secondary-links & {
+      @content;
+    }
+  }
 }
 
-// IE11 styles
-@include browser-query(ie11) {
-    pfe-navigation {
-        font-size: pfe-fetch(FontSize);
-    }
-    
-    pfe-navigation-item {
-        [slot="trigger"] {
-            width: 100%;
-            max-width: 130px;
-            font-size: pfe-fetch(FontSize--xs);
-            margin: 0;
-
-            a {
-                color: pfe-var(text--on-dark);
-            }
-        }
-
-        [slot="tray"] {
-            width: 100%;
-            min-height: 60px;
-            flex-direction: column;
-        }
-
-        // Accordion trigger styles when expanded.
-        &.expanded {
-            @media screen and (min-width: pfe-breakpoint(lg)) {
-                background-color: pfe-var(surface--lightest);
-                border-top-color: pfe-var(ui-accent);
-            }
-            [slot="trigger"] a {
-                color: pfe-var(text);
-            }
-        
-        }
-    }
-
-    .pfe-navigation__container {
-        @each $size in (md, lg) {
-            @media screen and (min-width: pfe-breakpoint(#{$size})) {
-                max-width: pfe-breakpoint(#{$size});
-            }
-        }
-        @media screen and (min-width: pfe-breakpoint(xl)) {
-            max-width: 1140px;
-        }
-    }
-
-    .pfe-navigation-item__tray {
-        &--container {
-            padding: 1em 0;
-            @media screen and (min-width: pfe-breakpoint(lg)) {
-                margin: 0 auto;
-            }
-        }
-
-        [is_nested][parent_hidden] & {
-            max-height: none;
-            overflow: visible;
-        }
-    }
-
-    @media screen and (max-width: 1023px) {
-        pfe-navigation-main,
-        .pfe-navigation__main > :not([hidden]) {
-            height: auto;
-        }
-
-        .pfe-navigation__main {
-            display: block !important;
-        }
-
-        [class*="pfe-navigation-item-"] .pfe-navigation-item__trigger.pfe-navigation-item {
-            background-color: transparent !important;
-        }
-
-        [class*="pfe-navigation-item-"] .pfe-navigation-item__trigger.pfe-navigation-item[aria-expanded=true] {
-            background-color: white !important;
-        }
-
-        .pfe-navigation-item__tray {
-            max-height: none !important;
-        }
-
-        .pfe-navigation-item-2 .pfe-navigation-item__trigger.pfe-navigation-item:hover,
-        .pfe-navigation-item-2 .pfe-navigation-item__trigger.pfe-navigation-item:focus,
-        .pfe-navigation-item-2 .pfe-navigation-item__trigger.pfe-navigation-item[aria-expanded=true] {
-            border-left-width: 4px;
-            border-top-style: solid;
-            border-left-color: pfe-var(ui-accent);
-            border-right-width: 1px;
-            border-right-style: solid;
-            border-right-color: #d2d2d2;
-        }
-
-        [class*="pfe-navigation-item-"] .pfe-navigation-item__trigger.pfe-navigation-item[aria-expanded=true] {
-            background-color: white;
-            border-top-width: 3px;
-            border-top-style: solid;
-            border-top-color: pfe-var(ui-accent);
-        }
-
-        [pfe-icon=web-mobile-menu]:not([show_links]) {
-            border-bottom: none;
-
-            // Set max-height for nested accordions so that they can scroll.
-            .pfe-navigation-item__tray.pfe-navigation-item .pfe-navigation-item__tray.pfe-navigation-item {
-                max-height: 500px !important;
-                overflow-y: scroll;
-                background-color: white;
-            }
-
-            .pfe-navigation-item__tray.pfe-navigation-item  .pfe-navigation-item__trigger.pfe-navigation-item:not([aria-expanded=true]) {
-                border-bottom-width: 1px;
-                border-bottom-style: solid;
-                border-bottom-color: pfe-var(surface--border);
-            }
-        }
-
-        [pfe-icon=web-user],
-        [pfe-icon=web-globe] {
-            padding-left: 0 !important;
-
-            .pfe-navigation-item__trigger a {
-                font-size: pfe-fetch(FontSize--xs);
-            }
-            .pfe-navigation-item__trigger.pfe-navigation-item  {
-                border-bottom: none !important;
-            }
-        }
-    }
-
-    .pfe-navigation-1 {
-        .pfe-navigation__wrapper.pfe-navigation {
-            min-height: 0;
-        }
-    
-        .pfe-navigation__logo.pfe-navigation {
-            height: 80px;
-        }
-    }
-    
-    pfe-navigation [slot="logo"] {
-        max-width: 100%;
-    }
-
-    .pfe-navigation-item__trigger {
-        &.pfe-navigation-item:hover {
-            cursor: pointer;
-            border-top:  pfe-var(surface--border-width--heavy) solid pfe-var(ui-accent);
-        }
-
-        .pfe-navigation__utility--mobile > *:not(:last-child) {
-            margin-bottom: pfe-var(container-spacer);
-        }
-
-        pfe-icon,
-        > *.pfe-navigation-item__trigger--icon:first-child {
-            display: none;
-        }
-
-        .pfe-navigation-item__tray--container {
-            padding-top: pfe-var(container-spacer);
-        }
-
-        > *:not(.pfe-navigation-item__trigger--icon) {
-            color: pfe-local($cssvar: Color, $fallback: #{map-get($pfe-colors, text--on-dark)});
-
-            .expanded & {
-                color: pfe-var(text);
-            }
-
-            a,
-            a:hover,
-            a:visited {
-                color: inherit;
-            }
-        }
-    }
-
-    .pfe-navigation--column-span-2 {
-        -ms-grid-column-span: 1 !important;
-    }
-
-    :not([pfe-icon=web-mobile-menu]):not([is_nested]).pfe-navigation-item-1 .pfe-navigation-item__tray.pfe-navigation-item {
-        color: pfe-var(ui-base) !important;
-    }
-
-    [pfe-icon=web-mobile-menu]:not([show_links]).pfe-navigation-item-3 .pfe-navigation__main .pfe-navigation-item__tray.pfe-navigation-item {
-        top: 0 !important;
-    }
-
-    .pfe-navigation--footer .pfe-navigation--column {
-        @media (min-width: pfe-breakpoint(md)) {
-            display: flex;
-            align-items: center;
-        }
-    }
-}
-
-@include browser-query(edge) {
-    pfe-navigation-item {
-        &[pfe-icon] {
-            > .pfe-navigation-item__trigger {
-                > [slot="trigger"] {
-                    font-size: pfe-fetch(FontSize--xs);
-                    text-align: center;
-                }
-            }
-        }
-
-        [slot="tray"] {
-            display: flex;
-        }
-
-        [slot="trigger"] {
-            font-size: pfe-fetch(FontSize--md);
-            margin: 0;
-        }
-
-        .pfe-navigation-item__trigger[aria-expanded=true] {
-            &::after {
-                display: block !important;
-            }
-        }
-
-        &.expanded {
-            .pfe-navigation-item__trigger {
-                pfe-icon:not(.load-failed) svg.pfe-icon filter.pfe-icon feFlood.pfe-icon {
-                    flood-color: pfe-var(ui-accent) !important;
-                }
-            }
-
-            [slot="trigger"] {
-                a {
-                    color: pfe-var(text) !important;
-                }
-            }
-        }
-        &[is_nested]:not([parent_hidden]) .pfe-navigation-item__trigger.pfe-navigation-item::after {
-            height: .5em !important;
-            width: .5em !important;
-            top: 22px !important;
-        }
-    }
-
-    .pfe-navigation-item__trigger {
-        transition: none !important;
-    }
-
-    @media screen and (max-width: pfe-breakpoint("sm-desktop", $max: true, $map: false)) {
-        pfe-navigation-item.expanded[pfe-icon=web-mobile-menu]:not([has_tray]) {
-            background-color: pfe-var(surface--lightest);
-        }
-        pfe-navigation-item:not([parent_hidden])[is_nested].expanded .pfe-navigation-item__trigger.pfe-navigation-item[aria-expanded="true"] {
-            border-left: 4px solid #06c !important;
-            border-right: 1px solid #d2d2d2 !important;
-        }
-        pfe-navigation-item:not([parent_hidden])[is_nested] .pfe-navigation-item__trigger.pfe-navigation-item[aria-expanded="true"] {
-            border-left: 4px solid #06c !important;
-            border-right: 1px solid #d2d2d2 !important;
-        }
-    }
-
-    // Hide the carets on desktop.
-    @media screen and (min-width: 1024px) {
-        .pfe-navigation-item__trigger::after {
-            display: none !important;
-        }
-        .pfe-navigation-item__trigger:hover::after {
-            display: block !important;
-        }
-    }
-
-    .pfe-navigation-item__trigger {
-        --pfe-navigation__trigger-icon--Visible: hidden;
-
-        &:hover {
-            --pfe-navigation__trigger-icon--Visible: visible;
-        }
-        &.pfe-navigation-item {
-            box-sizing: border-box;
-
-            &:hover {
-                cursor: pointer;
-                border-top: pfe-var(surface--border-width--heavy) solid pfe-var(ui-accent);
-            }
-        }
-        pfe-icon {
-            max-height: 20px;
-        }
-        pfe-icon:not(.load-failed) svg.pfe-icon filter.pfe-icon feFlood.pfe-icon {
-            flood-color: pfe-var(text--on-dark) !important;
-        }
-    }
-
-    pfe-navigation-item:not([parent_hidden])[is_nested].expanded .pfe-navigation-item__tray.pfe-navigation-item {
-        top: 0;
-    }
-    .pfe-navigation__logo {
-        margin-right: 20px; // Account for collapsed padding-right: 20px;
-    }
-    .pfe-navigation--footer .pfe-navigation--column {
-        @media (min-width: pfe-breakpoint(md)) {
-            display: flex;
-            align-items: center;
-        }
-    }
+pfe-navigation [slot],
+.pfe-navigation__menu {
+  @media print {
+    display: none!important;
+  }
 }
 
 pfe-navigation {
-    [slot="logo"] {
-        margin: 0;
-        > a {
-            display: flex;
-            align-items: center;
+  --pfe-reveal-duration: 0.1618s;
+  --pfe-reveal-delay: 2s;
 
-            > * {
-                max-height: 32px;
-            }
-        }
+  > * {
+    // Added @supports to prevent old browsers from using these styles
+    @supports (display: grid) {
+      transition: opacity var(--pfe-reveal-duration, 0.1618s) ease-in-out;
+      opacity: 0;
+      visibility: hidden;
+      animation: reveal var(--pfe-reveal-duration, 0.1618s) var(--pfe-reveal-delay, 2s) 1 forwards;
     }
+  }
 
-    [slot="mobile-search"] {
-        input[type="text"] {
-            padding: 5px 10px;
-        }
-    }
+  @include pfe-set-broadcast-context(light);
+  &.pfe-navigation--processed  > * {
+    animation-delay: 0;
+  }
 }
 
-// Turn off internal link outline
-pfe-navigation-item {
-    [slot="trigger"] {
-        font-family: pfe-var(font-family);
-        margin: .25em 0 0 0!important;
-        line-height: pfe-fetch(line-height);
-    }
-    // Utility links.
-    pfe-icon + [slot="trigger"] > a {
-        font-size: pfe-fetch(FontSize--xs);
-
-        @include browser-query(ie11) {
-            font-size: 16px;
-        }
-    }
-    [slot="trigger"] > a {
-        outline: none;
-        text-decoration: none;
-        color: pfe-var(ui-accent--text) !important;
-
-        &:hover,
-        &:focus {
-            text-decoration: none; //Override bootstrap.
-        }
-    }
-    &.expanded {
-        [slot="trigger"] > a,
-        [slot="trigger"] > a.active {
-            color: pfe-var(text) !important;
-        }
-        pfe-navigation-main[show_content] & {
-            [slot="trigger"] > a.active {
-            color: pfe-var(text) !important;
-            }
-        }
-    }
-    // Override active link color.
-    pfe-navigation-main[show_content] & {
-        [slot="trigger"] > a.active {
-            color: pfe-var(ui-accent--text) !important;
-        }
-    }
-    &[parent_hidden] [slot="trigger"] {
-        text-align: center;
-    }
-
-    // Style main menu links when in the tray.
-    &:not([parent_hidden])[is_nested] [slot="trigger"] > a {
-        color: pfe-var(text) !important;
-    }
+pfe-navigation-dropdown {
+  color: pfe-local(Color, $region: dropdown);
 }
 
-.pfe-navigation {
-    &-grid {
-        @media (min-width: pfe-breakpoint(sm)) {
-            column-count: 2;
-            column-gap: 32px;
-            flex: 1;
-        }
-
-        @media (min-width: pfe-breakpoint(lg)) {
-            column-count: 3;
-        }
-
-        @media (min-width: pfe-breakpoint(xl)) {
-            /* autoprefixer grid: autoplace */
-            display: grid;
-            grid-gap: 32px;
-            grid-template-columns: repeat(4, 1fr);
-            -ms-grid-columns: 1fr 1fr 1fr 1fr;
-
-            .pfe-navigation--column:nth-child(1) {
-                -ms-grid-column: 1;
-            }
-
-            .pfe-navigation--column:nth-child(2) {
-                -ms-grid-column: 2;
-            }
-
-            .pfe-navigation--column:nth-child(3) {
-                -ms-grid-column: 3;
-            }
-
-            .pfe-navigation--column:nth-child(4) {
-                -ms-grid-column: 4;
-            }
-        }
-    }
-    &--column-span-2 {
-        // intentinally not setting for IE prefix to prevent column overlap
-        @media (min-width: pfe-breakpoint(xl)) {
-            grid-column: span 2;
-        }
-    }
-    &--footer:not(:empty) {
-        margin:   calc(#{pfe-var(container-padding, $fallback: 16px)} * 2) 0 calc(#{pfe-var(container-padding, $fallback: 16px)} * 1.5);
-        border-top: 1px solid lightgray;
-        padding:   calc(#{pfe-var(container-padding, $fallback: 16px)} * 2.5) 0 0;
-
-        >*:not(:last-child) {
-            margin-bottom: 32px;
-        }
-
-        >* {
-            flex: 0 1 45%;
-        }
-
-        @media (min-width: pfe-breakpoint(sm)) {
-            display: flex;
-            flex-wrap: wrap;
-            align-items: center;
-            justify-content: space-between;
-
-            >*:not(:last-child) {
-                margin-bottom: 0;
-            }
-
-            >*:nth-child(n+3) {
-                margin-top: 32px;
-            }
-        }
-
-        @media (min-width: pfe-breakpoint(md)) {
-            justify-content: flex-start;
-        }
-
-        @media (min-width: pfe-breakpoint(lg)) {
-            // Not setting grid prefix here since IE doesn't support auto-flow
-            display: grid;
-            grid-gap: 32px;
-            grid-auto-flow: column;
-            -ms-grid-columns: 1fr 1fr 1fr 1fr;
-
-            .pfe-navigation--column:nth-child(1) {
-                -ms-grid-column: 1;
-            }
-
-            .pfe-navigation--column:nth-child(2) {
-                -ms-grid-column: 2;
-            }
-
-            .pfe-navigation--column:nth-child(3) {
-                -ms-grid-column: 3;
-            }
-
-            .pfe-navigation--column:nth-child(4) {
-                -ms-grid-column: 4;
-            }               
-
-            >*:nth-child(n+3) {
-                margin-top: 0;
-            }
-        }
-
-        @media (min-width: pfe-breakpoint(xl)) {
-            padding-bottom: 0;
-            display: -ms-grid;
-            grid-template-columns: repeat(4, 1fr);
-            -ms-grid-columns: 1fr 1fr 1fr 1fr;
-        }
-    }
+@keyframes reveal {
+  0% {
+    visibility: hidden;
+    opacity: 0;
+  }
+  1% {
+    visibility: visible;
+  }
+  100% {
+    opacity: 1;
+    visibility: visible;
+  }
 }
 
-// This class is added manually inside the tray on the light DOM content
-.pfe-navigation-item__tray--container {
-    width: 100%;
+// Scoping styles in ID to fight other light dom styles
+#{'#' + $pfe-navigation-id},
+pfe-navigation {
 
-    // stop using padding, start using max width at medium breakpoint
-    @media screen and (min-width: pfe-breakpoint(md)) {
+  &,
+  * {
+    box-sizing: border-box;
+  }
+
+  // Hide fallback login link if component has mounted
+  [pfelement] {
+    .pfe-navigation__log-in-link {
+      display: none;
+    }
+  }
+
+  // No JS Styles
+  // --------------------------------------------------------
+  & {
+    @include pfe-navigation__wrapper;
+    @include pfe-navigation__wrapper--mobile;
+    position: relative;
+    height: auto;
+    min-height: pfe-local(Height, $region: nav-bar);
+    @include breakpoint('secondary-links-expand') {
+      @include pfe-navigation__wrapper--collapsed-menu;
+      flex-wrap: wrap;
+    }
+    @include breakpoint('nav-expand') {
+      @include pfe-navigation__wrapper--desktop;
+    }
+
+    // Hide dropdowns unless component mounts
+    .pfe-navigation__dropdown,
+    pfe-navigation-dropdown {
+      display: none;
+    }
+
+    // Hide slotted elements unless component mounts
+    > [slot] {
+      width: 0;
+      height: 0;
+      overflow: hidden;
+      visibility: hidden;
+    }
+
+    // @note Have to qualify class with the tag because of Shady CSS
+    nav.pfe-navigation {
+      @include breakpoint('secondary-links-expand') {
+        display: flex;
+        align-items: stretch;
+        flex-wrap: wrap;
+      }
+      @include breakpoint(lg) {
+        flex-wrap: nowrap;
+      }
+    }
+
+    .pfe-navigation__logo-wrapper {
+      @include pfe-navigation__logo-wrapper;
+      min-width: 150px;
+    }
+
+    .pfe-navigation__logo-link {
+      @include pfe-navigation__logo-link;
+    }
+
+    .pfe-navigation__logo-image {
+      @include pfe-navigation__logo-image;
+    }
+
+    .pfe-navigation__log-in-link,
+    .pfe-navigation__menu-link,
+    .pfe-navigation__fallback-links a {
+      @include top-level-button;
+      justify-content: center;
+      align-items: center;
+      color: pfe-local(Color--default, $region: nav-bar);
+
+      // Specificity bump
+      &[class],
+      &[href] {
+        justify-content: center;
+        align-items: center;
+      }
+    }
+
+    .pfe-navigation__menu,
+    .pfe-navigation__fallback-links {
+      margin: 0;
       padding: 0;
-      max-width: pfe-local(Width, $fallback: 1140px);
-    }
-    // Loop through the other breakpoints
+      list-style: none;
+      font-size: inherit;
+      @include breakpoint('secondary-links-expand') {
+        display: flex;
+        align-items: stretch;
+      }
 
-    pfe-navigation-item:not([pfe-full-width]) & {
-      @each $size in ("md", "lg", "xl") {
-        @media screen and (min-width: pfe-breakpoint( #{$size} ) ) {
-          --pfe-navigation--Width: calc(#{pfe-breakpoint( #{$size} )} - #{pfe-local(MaxWidth)});
+      li {
+        margin: 0;
+        padding: 0;
+        font-size: inherit;
+
+        &:before {
+          content: none;
         }
       }
     }
-    @include browser-query(ie11) {
-        padding-top: 1.5em;
-        padding-bottom: 1.5em
-    }
-    input[type="text"] {
-        padding: 5px 10px;
-    }
-}
 
-.pfe-link-list {
-    -webkit-column-break-inside: avoid;
-    page-break-inside: avoid;
-    break-inside: avoid;
-    display: block;
-    box-sizing: border-box;
-    width: 100%;
-    margin-bottom: 1em;
-
-    &--header {
-        font-family: pfe-var(font-family);
-        margin: 0 0 .75em 0;
-        font-size: pfe-var(FontSize--md);
-        font-weight: pfe-var(font-weight--light);
-        line-height: 1.75;
-        color: pfe-var(text);
-
-        @media (min-width: pfe-breakpoint(xl)) {
-            font-size: 16px;
-        }
-
-        a {
-            color: pfe-var(text);
-            text-decoration: underline;
-
-            &:hover {
-                color: pfe-var(text);
-                text-decoration: none;
-            }
-
-            &:focus {
-                outline-offset: 1px;
-                outline-style: dotted;
-                outline-width: 1px;
-                outline-color: pfe-broadcasted(link--focus);
-            }
-        }
+    .pfe-navigation__fallback-links {
+      margin-left: auto;
     }
 
-    &--group {
-        list-style: none;
-        padding: 0;
-
-        &-item {
-            line-height: 1.3;
-            margin-bottom: .75em;
-        }
-
-        &-item > a {
-            font-size: 16px;
-            color: pfe-broadcasted(link);
-            text-decoration: pfe-broadcasted(link-decoration);
-            &:visited {
-                color: pfe-broadcasted(link--visited);
-            }
-            &:hover {
-                color: pfe-broadcasted(link--hover);
-                text-decoration: pfe-broadcasted(link-decoration--hover);
-            }
-            &:focus {
-                outline-offset: 1px;
-                outline-style: dotted;
-                outline-width: 1px;
-                outline-color: pfe-broadcasted(link--focus);
-                color: pfe-broadcasted(link--focus);
-            }
-        }
+    .pfe-navigation__menu-link {
+      display: flex;
+      white-space: nowrap;
+      font-size: pfe-var(FontSize--md);
     }
-}
-
-// Set collapsed trigger links to always appear white.
-pfe-navigation-item.expanded pfe-navigation-item[parent_hidden]:not(.expanded) [slot="trigger"] > a,
-pfe-navigation-item.expanded pfe-navigation-item[parent_hidden]:not(.expanded) [slot="trigger"] > a.active {
-    color: #fff !important;
-}
-
-// Override trigger font-size on older browsers.
-[slot="trigger"],
-[slot="trigger"] > a {
-    font-size: 12px;
-}
-
-pfe-navigation-main [slot="trigger"],
-pfe-navigation-main [slot="trigger"] > a {
-    font-size: pfe-var(FontSize--md);
-    @include browser-query(ie11) {
-        font-size: 16px;
-    }
-
-    @media screen and (min-width: pfe-breakpoint("sm-desktop", $map: false) )
-                  and (max-width: pfe-breakpoint("xl", $max: true) ) {
-        font-size: 13px;
-    }
-}
-
-// Apply flexbox styles to older browsers that don't support ShadowDOM.
-[slot="tray"] {
-  display: flex;
-  flex-grow: 1;
-  justify-content: center;
-}
-
-@media screen and (max-width: pfe-breakpoint("sm-desktop", $max: true, $map: false) ) {
-    .pfe-navigation__main .pfe-navigation-item__tray {
-        position: relative;
-        top: 0 !important;
-    }
-}
-
-@media screen and (max-width: 1023px) {
-  .pfe-navigation-item .pfe-navigation-item__tray {
-    max-height: none !important;
   }
+
+  &.pfe-navigation--processed {
+    display: block;
+    padding: 0;
+
+    &:before {
+      content: none;
+    }
+
+    // Unhide when component connected
+    > [slot] {
+      visibility: visible;
+      width: auto;
+      height: auto;
+      overflow: visible;
+    }
+
+    // Unhide when component connected
+    pfe-navigation-dropdown {
+      display: block;
+    }
+
+    // Fade hidden elements in
+    .pfe-navigation__dropdown,
+    pfe-navigation-dropdown,
+    > [slot] {
+      opacity: 1;
+      animation: none;
+    }
+
+    // Slotted content styles
+    // --------------------------------------------------------
+    [slot='secondary-links'] {
+      @include secondary-links-li;
+
+      > a,
+      > button {
+        @include top-level-button;
+
+        &:focus {
+          @include breakpoint('secondary-links-expand') {
+            @include alt-focus-styles(pfe-local(Color--default, $region: nav-bar));
+          }
+          @include collapse('secondary-links') {
+            box-shadow: none;
+          }
+        }
+
+        &[aria-expanded='true'] {
+          @include breakpoint('secondary-links-expand') {
+            color: pfe-local(Color--active, $region: nav-bar);
+            background: pfe-local(toggle--BackgroundColor--active, $region: nav-bar);
+          }
+          @include collapse('secondary-links') {
+            box-shadow: none;
+            background: transparent;
+          }
+        }
+      }
+    }
+
+    .pfe-navigation__custom-dropdown__wrapper--single-column {
+      position: relative;
+    }
+
+    // Slotted li to secondary-links after the component has mounted
+    .pfe-navigation__custom-dropdown__wrapper {
+      display: block;
+    }
+
+    // @note Slot prefix is for ShadyCSS/IE11
+    [slot="secondary-links"] .pfe-navigation__dropdown-wrapper {
+      &[class] { // Specificity bump
+        height: 0;
+        transition: pfe-local(accordion-transition);
+        @media (prefers-reduced-motion) {
+          transition: none;
+        }
+        @include breakpoint('secondary-links-expand') {
+          position: absolute;
+          top: pfe-local(Height, $region: nav-bar);
+          right: 0;
+        }
+        @include collapse('secondary-links') {
+          position: static;
+        }
+
+        &[aria-hidden='false'] {
+          @include breakpoint('secondary-links-expand') {
+            height: auto;
+          }
+          @include collapse('secondary-links') {
+            height: 0;
+          }
+        }
+      }
+    }
+
+    &[breakpoint='mobile'] [slot="secondary-links"][mobile-slider] .pfe-navigation__dropdown-wrapper {
+      $vertical-offset: pfe-local(PaddingVertical, $region: mobile-dropdown);
+      $horizontal-offset: pfe-local(PaddingHorizontal, $region: mobile-dropdown);
+      position: absolute;
+      top: 0;
+      left: 100vw;
+      left: calc(100vw - #{$horizontal-offset});
+      width: 100vw;
+
+      &[aria-hidden='false'] {
+        height: 100vh;
+        height: calc(100vh - #{pfe-local(Height, $region: nav-bar)});
+        overflow-y: scroll;
+      }
+    }
+
+    .pfe-navigation__dropdown-wrapper--default-styles,
+    .pfe-navigation-item__tray--container,
+    .pfe-navigation__site-switcher .pfe-navigation__dropdown-wrapper {
+      padding: 0 pfe-local('full-width--spacing--mobile', $region: 'dropdown');
+      background: pfe-local(Background, $region: dropdown);
+      @include breakpoint('secondary-links-expand') {
+        padding: 0 #{pfe-local('full-width--spacing--desktop', $region: 'dropdown')} + #{pfe-local('full-width--spacing--mobile', $region: 'dropdown')};
+      }
+      @include collapse('secondary-links') {
+        padding: 0 pfe-local('full-width--spacing--mobile', $region: 'dropdown');
+      }
+
+      ul,
+      li {
+        margin: 0;
+        padding: 0;
+        list-style: none;
+      }
+
+      @include pfe-navigation__dropdown-content-styling;
+    }
+
+    // Dropdown content wrapper - lays out dropdown internals
+    // Layout mixins are shared with lightdom styles, can be found in _variables-mixins.scss
+    .pfe-navigation__dropdown--default-styles,
+    .pfe-navigation-grid, // @note v1.x support
+    site-switcher {
+      @include pfe-navigation__dropdown-layout--mobile;
+      margin-left: auto;
+      margin-right: auto;
+      font-size: pfe-var(FontSize--md);
+      color: pfe-local(Color, $region: dropdown);
+      @include breakpoint('secondary-links-expand') {
+        @include pfe-navigation__dropdown-layout--tablet;
+      }
+      @include breakpoint('nav-expand') {
+        @include pfe-navigation__dropdown-layout--desktop;
+      }
+      @include collapse('nav') {
+        @include pfe-navigation__dropdown-layout--tablet;
+      }
+      @include collapse('secondary-links') {
+        @include pfe-navigation__dropdown-layout--mobile;
+      }
+
+      .pfe-navigation__menu-item--open & {
+        visibility: visible;
+        transition-delay: 0s;
+      }
+
+      > * {
+        $mobile-margin: 0 0 18px;
+        margin: $mobile-margin;
+        break-inside: avoid;
+        @include breakpoint('nav-expand') {
+          margin: 0;
+        }
+        @include collapse('nav') {
+          margin: $mobile-margin;
+        }
+      }
+    }
+
+    .pfe-navigation__dropdown--1-x {
+      display: block;
+    }
+
+    .pfe-navigation__site-switcher .pfe-navigation__dropdown {
+      background: #fff;
+    }
+
+    .pfe-navigation__dropdown-wrapper--invisible {
+      pfe-navigation-dropdown {
+        visibility: hidden;
+      }
+    }
+
+    .pfe-navigation__custom-dropdown--single-column[class] {
+      @include single-column-dropdown('secondary-links');
+      padding: 0;
+      @include breakpoint('secondary-links') {
+        right: 0;
+      }
+    }
+
+    .pfe-navigation__custom-dropdown--full[class] {
+      width: 100%;
+      @include breakpoint('secondary-links-expand') {
+        position: absolute;
+        left: 0;
+        right: 0;
+      }
+      @include collapse('secondary-links') {
+        position: static;
+      }
+
+      .pfe-navigation__dropdown {
+        width: 100%;
+      }
+    }
+
+    // Base default styles for search bar and search button
+    // @todo Since this is opt in light DOM styling, don't think we need color var here?
+    .pfe-navigation__search--default-styles {
+      padding-left: 16px;
+      padding-right: 16px;
+
+      form {
+        display: flex;
+        align-items: center;
+      }
+
+      input,
+      button {
+        padding: 10px;
+        transition: box-shadow 0.2s;
+      }
+
+      input {
+        flex-grow: 1;
+        flex-shrink: 1;
+        flex-basis: 0%;
+        margin-right: 8px;
+        border: 1px solid #f0f0f0;
+        border-bottom: 1px solid #8b8e91;
+        color: #717579;
+        font-size: pfe-var(FontSize--md);
+      }
+
+      input::placeholder {
+        color: #717579;
+      }
+
+      button {
+        flex-grow: 0;
+        flex-shrink: 1;
+        flex-basis: auto;
+        border-radius: 2px;
+        border: 1px solid #e00;
+        background-color: #e00;
+        color: #fff;
+        font-size: pfe-var(FontSize--md);
+      }
+
+      input:focus,
+      input:hover {
+        @include alt-focus-styles(#000);
+      }
+
+      button:focus,
+      button:hover {
+        @include alt-focus-styles(#fff);
+      }
+    }
+  }
+
+  // Hide Back to Menu button everywhere but mobile
+  .pfe-navigation__site-switcher__back-wrapper {
+    display: block;
+    border-bottom: pfe-local(separator--Border, $region: dropdown);
+
+    @include breakpoint('secondary-links-expand') {
+      display: none;
+    }
+    @include collapse('secondary-links') {
+      display: block;
+    }
+  }
+
+  .pfe-navigation__site-switcher__back-button {
+    position: relative;
+    width: 100%;
+    padding: 21px 21px 21px 45px;
+    border: 1px solid transparent;
+    font-size: pfe-var(FontSize--md);
+    color: pfe-local(link--Color, $region: dropdown);
+    text-align: left;
+    background-color: transparent;
+    cursor: pointer;
+
+    &:before {
+      @include pfe-navigation__back__before--mobile;
+      content: '';
+    }
+
+    &:focus,
+    &:hover {
+      color: pfe-local(link--Color--hover, $region: dropdown);
+      @include focus-styles(pfe-local(Color, $region: dropdown), 1px);
+    }
+  }
+
+  &.pfe-navigation--processed site-switcher {
+    display: block;
+    columns: auto;
+    max-width: 100%;
+  }
+
+  &.pfe-navigation--stuck {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    z-index: pfe-zindex(navigation);
+  }
+
+  ///
+  // @note IE11/Crusty browser overrides
+  ///
+  &.pfe-navigation--in-crusty-browser {
+    .pfe-navigation__menu-item {
+      display: block;
+    }
+
+    .pfe-navigation__menu-link[aria-expanded="true"] {
+      color: pfe-local(Color--active, $region: nav-bar);
+      background: pfe-local(toggle--BackgroundColor--active, $region: nav-bar);
+
+      &:focus {
+        @include alt-focus-styles(currentColor);
+      }
+    }
+
+    .pfe-navigation__dropdown {
+      display: flex;
+      flex-wrap: wrap;
+
+      > .style-scope { // .style-scope is added by ShadyCSS
+        flex-basis: 25%;
+      }
+
+      .pfe-navigation__footer.style-scope {
+        flex-basis: 100%;
+
+        > .style-scope {
+          margin-right: 16px;
+        }
+      }
+    }
+
+    .pfe-navigation__dropdown--single-column {
+
+      &,
+      & > .style-scope,
+      ul {
+        display: flex;
+        flex-direction: column;
+        flex-wrap: nowrap;
+      }
+
+      > .style-scope {
+        flex-basis: auto;
+      }
+    }
+
+    .pfe-navigation__secondary-link,
+    [slot="secondary-links"] > a,
+    .pfe-navigation__search-toggle {
+      color: #fff!important;
+      justify-content: center!important;
+
+      &[aria-expanded="true"] {
+        color: #151515!important;
+      }
+
+      // @note Hiding icons in IE11, they are really buggy in IE
+      .secondary-link__icon-wrapper,
+      pfe-icon {
+        display: none!important;
+      }
+
+    }
+
+    .pfe-navigation__account-wrapper--logged-in {
+      .pfe-navigation__log-in-link {
+        display: none!important;
+      }
+    }
+  }
+} // @end main pfe-navigation styles
+
+
+.pfe-navigation__dropdown-wrapper {
+  overflow: hidden; // @note: Should not be set to visible
+}
+
+.pfe-navigation__custom-dropdown--single-column {
+  @include breakpoint('secondary-links') {
+    min-width: 25em;
+  }
+  @include collapse('secondary-links') {
+    min-width: 0;
+  }
+}
+
+.secondary-link__icon-wrapper {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.secondary-link__alert-count {
+  display: block;
+  font-size: var(--pfe-navigation--FontSize--xs, 12px);
+  line-height: 20px;
+  min-width: 23px;
+  margin: 0 4px 0 2px;
+  padding: 0 8px;
+  border-radius: 20px;
+  overflow: hidden;
+  color: pfe-local(Color--on-highlight, $region: nav-bar);
+  background: pfe-local(alert-color, $region: nav-bar);
+
+  &:empty {
+    display: none;
+  }
+}
+
+#pfe-navigation__1x-skip-links {
+  position: absolute;
+  top: 0;
+  left: 0;
+
+  &,
+  li {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    width: 0;
+    height: 0;
+  }
+}
+
+.skip-link[class][class] { // Adding specificity to beat out site styles
+  font-size: pfe-var(FontSize--sm);
+  line-height: 18px;
+
+  &:focus {
+    position: fixed;
+    top: 8px;
+    left: 50%;
+    z-index: 99999;
+    width: auto;
+    height: auto;
+    padding: (6 / 14 * 1em) (8 / 14 * 1em);
+    border-radius: (3 / 14 * 1em);
+    transform: translateX(-50%);
+    clip: auto;
+    background: pfe-local(BackgroundColor, $region: skip-link);
+    color: pfe-local(Color, $region: skip-link);
+    text-decoration: none;
+  }
+}
+
+pfe-navigation pfe-navigation-account[slot="account"] {
+  width: 100%;
+  background: pfe-local(Background, $region: dropdown);
 }
