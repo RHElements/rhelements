@@ -229,6 +229,16 @@ class PFElement extends HTMLElement {
   }
 
   /**
+   * A quick way to fetch a random ID value.
+   * _Note:_ All values are prefixes with `pfe` automatically to ensure an ID-safe value is returned.
+   *
+   * @example: In a component's JS: `this.id = this.randomID;`
+   */
+  get randomId() {
+    return `${prefix}-` + Math.random().toString(36).substr(2, 9);
+  }
+
+  /**
    * Returns a boolean statement of whether or not this component contains any light DOM.
    * @returns {boolean}
    * @example if(this.hasLightDOM()) this._init();
@@ -282,6 +292,19 @@ class PFElement extends HTMLElement {
     }
   }
 
+  /**
+   * This will query for the value of or set the value of a custom property at a particular context in the component (either on the host or inside the shadow DOM or a specific slot).
+   *
+   * @param {String} name - The name of the custom property to be queried for or set; dash separated. Can be provided with or without the `--` prefix.
+   * @param {String} value - If provided, this is the value the custom property is set to.
+   * @param {String} [element = this] - The element to query for the value of the custom property.
+   * @example
+   * // returns #252527
+   * this.cssVariable(pfe-cta--Color);
+   * @example
+   * // returns #fff
+   * this.cssVariable(pfe-cta--Color, #fff);
+   */
   cssVariable(name, value, element = this) {
     name = name.substr(0, 2) !== "--" ? "--" + name : name;
     if (value) {
@@ -338,6 +361,15 @@ class PFElement extends HTMLElement {
     });
   }
 
+  /**
+   * This re-queries the element for the correct value of the component's context. Useful for when a cosntext in a parent component has changed and the children need to be aware of that update.
+   *
+   * @param {String} fallback - Optional fallback context if no context attribute or variable is found.
+   * @example
+   * this.resetContext();
+   * @example
+   * this.resetContext(saturated);
+   */
   resetContext(fallback) {
     if (this.isIE11) return;
 
@@ -352,6 +384,100 @@ class PFElement extends HTMLElement {
 
     this.log(`Resetting context from ${this.on} to ${value || "null"}`);
     this.on = value;
+  }
+
+  /**
+   * This fetches the computed value of a CSS property by attaching a temporary element to the DOM.
+   * This is important specifically for properties like height or width that are influenced by layout.
+   * Or in situations where a shorthand might be used or stored in a variable.
+   *
+   * @param {Object} set - CSS property name in hyphen-case (padding-top instead of paddingTop) as the key and the property to query for as the value.
+   * @param {Array} props - A list of the properties to capture the computed value for (hyphen-case).
+   * @return {Object} result - An object with the property name (hyphen-case) as key and the value is the computed value on the element.
+   *
+   * @example: `this.getComputedValue({ padding: 10px 16px }, ["padding-top", "padding-right", "padding-bottom", "padding-left"])`
+   */
+  getComputedValue(set, props = [], child = document.createElement("div")) {
+    let computedStyle;
+    let result = {};
+    const temp = document.createElement("div");
+
+    // Make sure the element is not visible
+    temp.style.setProperty("position", "absolute");
+    temp.style.setProperty("left", "-110vw");
+
+    temp.appendChild(child);
+
+    // Attach styles to child element
+    Object.entries(set).forEach((item) => {
+      child.style.setProperty(item[0], item[1]);
+    });
+
+    // Attach element to DOM
+    document.querySelector("body").appendChild(temp);
+
+    // Get the computed style
+    computedStyle = window.getComputedStyle(child, temp);
+    if (typeof props === "object") {
+      props.map((prop) => {
+        let obj = {};
+        obj[prop] = computedStyle[prop];
+        // Add the object to the overall result
+        Object.assign(result, obj);
+      });
+    } else if (typeof props === "string") {
+      let obj = {};
+      obj[props] = computedStyle[props];
+      // Add the object to the overall result
+      Object.assign(result, obj);
+    }
+
+    // Clean up the DOM
+    temp.remove();
+
+    return result;
+  }
+
+  /**
+   * This converts property names such as background-color into BEM format (i.e., BackgroundColor)
+   * @param {String} property - CSS property name in hyphen format (padding-top, margin-bottom, etc.).
+   * @example this.toBEM(padding-top);
+   * @return {String} property - String where the provided property is converted to PascalCase.
+   * @TODO needs to be migrated to a mixin of pfelement?
+   */
+  toBEM(property) {
+    // Capitalize the first letter
+    property = `${property.charAt(0).toUpperCase()}${property.slice(1)}`;
+    // Replace dash with uppercase letter
+    property = property.replace(/\-([a-z])/g, (match, letter) => {
+      return letter.toUpperCase();
+    });
+    return property;
+  }
+
+  /**
+   * This converts shorthand CSS variables to explicit variables; for example,
+   * if a user sets --pfe-card--Padding, this captures that and converts it to
+   * --pfe-card--PaddingTop, --pfe-card--PaddingBottom, --pfe-card--PaddingRight, --pfe-card--PaddingLeft.
+   * @param {String} property - CSS property name in hyphen format (padding-top, margin-bottom, etc.).
+   * @param {Array} parts - CSS properties to break the shorthand into ([border-width, border-style, border-color]).
+   * @example getExplicitProps("padding", ["padding-top", "padding-right", "padding-bottom", "padding-left"]);
+   * @TODO needs to be migrated to a mixin of pfelement?
+   */
+  getExplicitProps(property, parts) {
+    const variable = this.cssVariable(`--${this.tag}--${this.toBEM(property)}`);
+    if (variable) {
+      let cssprops = {};
+      cssprops[property] = variable;
+      const actual = this.getComputedValue(cssprops, parts);
+
+      if (actual) {
+        // Set the CSS variable for each returned value
+        Object.entries(actual).forEach((item) => {
+          this.cssVariable(`--${this.tag}--${this.toBEM(item[0])}`, item[1]);
+        });
+      }
+    }
   }
 
   constructor(pfeClass, { type = null, delayRender = false } = {}) {
@@ -391,7 +517,9 @@ class PFElement extends HTMLElement {
     // Initalize the properties and attributes from the property getter
     this._initializeProperties();
 
-    this.attachShadow({ mode: "open" });
+    this.attachShadow({
+      mode: "open",
+    });
 
     // Tracks if the component has been initially rendered. Useful if for debouncing
     // template updates.
@@ -476,6 +604,8 @@ class PFElement extends HTMLElement {
    * Standard render function.
    */
   render() {
+    if (this._cascadeObserver) this._cascadeObserver.disconnect();
+
     this.shadowRoot.innerHTML = "";
     this.template.innerHTML = this.html;
 
@@ -486,6 +616,9 @@ class PFElement extends HTMLElement {
     this.shadowRoot.appendChild(this.template.content.cloneNode(true));
 
     this.log(`render`);
+
+    // Initialize the slot definitions (first, last, has_*)
+    this._initializeSlots();
 
     // Cascade properties to the rendered template
     this.cascadeProperties();
@@ -513,11 +646,6 @@ class PFElement extends HTMLElement {
       } catch (err) {
         this.log(`Performance marks are not supported by this browser.`);
       }
-    }
-
-    // If the slot definition exists, set up an observer
-    if (typeof this.slots === "object" && this._slotsObserver) {
-      this._slotsObserver.observe(this, { childList: true });
     }
 
     // If an observer was defined, set it to begin observing here
@@ -667,6 +795,9 @@ class PFElement extends HTMLElement {
         this.cascadeProperties(nonTextNodes);
       }
     }
+
+    // After parsing the cascade, re-initialize slots
+    this._initializeSlots();
   }
   /* --- End observers --- */
 
@@ -759,58 +890,29 @@ class PFElement extends HTMLElement {
   }
 
   /**
-   * Maps the defined slots into an object that is easier to query
+   * Parses slots and applies relevant metadata to the tag
    */
-  _initializeSlots(tag, slots) {
-    this.log("Validate slots...");
+  _initializeSlots() {
+    if (!this.shadowRoot) return;
 
-    if (this._slotsObserver) this._slotsObserver.disconnect();
+    [...this.shadowRoot.querySelectorAll("slot")].forEach((slot) => {
+      const assigned = [...slot.assignedNodes()].filter((item) => item.nodeName !== "#text");
+      if (assigned && assigned.length > 0) {
+        // If all nodes in a region have a hidden attribute
+        const hidden = assigned.filter((node) => node.hasAttribute("hidden"));
 
-    // Loop over the properties provided by the schema
-    Object.keys(slots).forEach((slot) => {
-      let slotObj = slots[slot];
+        let region = "default";
+        const slotName = slot.getAttribute("name");
+        if (slotName) region = slotName.replace(`${this.tag}--`, "");
 
-      // Only attach the information if the data provided is a schema object
-      if (typeof slotObj === "object") {
-        let slotExists = false;
-        let result = [];
-        // If it's a named slot, look for that slot definition
-        if (slotObj.namedSlot) {
-          // Check prefixed slots
-          result = this.getSlot(`${tag}--${slot}`);
-          if (result.length > 0) {
-            slotObj.nodes = result;
-            slotExists = true;
-          }
+        if (hidden.length === assigned.length) this.removeAttribute(`has_${region}`);
+        else this.setAttribute(`has_${region}`, "");
 
-          // Check for unprefixed slots
-          result = this.getSlot(`${slot}`);
-          if (result.length > 0) {
-            slotObj.nodes = result;
-            slotExists = true;
-          }
-          // If it's the default slot, look for direct children not assigned to a slot
-        } else {
-          result = [...this.children].filter((child) => !child.hasAttribute("slot"));
-
-          if (result.length > 0) {
-            slotObj.nodes = result;
-            slotExists = true;
-          }
-        }
-
-        // If the slot exists, attach an attribute to the parent to indicate that
-        if (slotExists) {
-          this.setAttribute(`has_${slot}`, "");
-        } else {
-          this.removeAttribute(`has_${slot}`);
-        }
+        // Label first and last attribute
+        assigned[0].setAttribute("first", "");
+        assigned[assigned.length - 1].setAttribute("last", "");
       }
     });
-
-    this.log("Slots validated.");
-
-    if (this._slotsObserver) this._slotsObserver.observe(this, { childList: true });
   }
 
   /**
@@ -1070,7 +1172,10 @@ class PFElement extends HTMLElement {
    */
   static _populateCache(pfe) {
     // @TODO add a warning when a component property conflicts with a global property.
-    const mergedProperties = { ...pfe.properties, ...PFElement.properties };
+    const mergedProperties = {
+      ...pfe.properties,
+      ...PFElement.properties,
+    };
 
     pfe._setCache("componentProperties", pfe.properties);
     pfe._setCache("globalProperties", PFElement.properties);

@@ -13,16 +13,16 @@
 ```
 
 ## Slots
-All slots are optional.  If the slot is not defined, the content will be added to the `body` region of the card.
+All slots are optional. If the slot is not defined, the content will be added to the `body` region of the card.
 
 ### Header
-If this slot is used, we expect a heading level tag (h1, h2, h3, h4, h5, h6).  An icon, svg, or use of the icon component are also valid in this region.
+If this slot is used, we expect a heading level tag (h1, h2, h3, h4, h5, h6). An icon, svg, or use of the icon component are also valid in this region.
 
 ### Default slot (body)
 Any content that is not designated for the `header` or `footer` slot, will go to this slot.
 
 ### Footer
-Use this slot for anything that you want to be stuck to the base of the card.  This region is bottom-aligned.
+Use this slot for anything that you want to be stuck to the base of the card. This region is bottom-aligned.
 
 ## Attributes
 
@@ -59,10 +59,67 @@ There are several attributes available for customizing the visual treatment of t
 ## Variables
 There are several powerful variables available to hook into and override default styles.
 
-- **Background color**: Though using the `pfe-color` attribute is strongly recommended when setting the background color for the band, you can also use completely custom colors by updating the `--pfe-band--BackgroundColor` variable.  If you update this value manually, you should also update the `--context` context variable to invoke the right context on it and it's child elements.  Supported contexts include: `light`, `dark`, and `saturated`.
-- **Background position**: This is designed for use with the `pfe-img-src` attribute to allow you to align your background image.  Default value is `center center`. **Variable name:** `--pfe-card--BackgroundPosition`.
-- **Border**: This allows the customization of a border around the entire container.  There is a variable for the entire border shorthand (transparent by default) or you can hook into the individual properties. **Variable name:** `--pfe-card--BorderRadius` and `--pfe-card--Border` or `--pfe-card--BorderWeight`, `--pfe-card--BorderStyle`, `--pfe-card--BorderColor`.
-- **Padding**: You can customize the padding around the outside of the card container by connecting to either the shortcut padding variable or just one or more of the individual padding regions. **Variable names:** `--pfe-card--Padding` or `--pfe-card--PaddingTop`, `--pfe-card--PaddingRight`, `--pfe-card--PaddingBottom`, `--pfe-card--PaddingLeft`.
+- **Background color**: Though using the `color` attribute is strongly recommended when setting the background color for the band, you can also use completely custom colors by updating the `--pfe-band--BackgroundColor` variable. If you update this value manually, you should also update the `--context` variable to invoke the right context on it and it's child elements. Supported contexts include: `light`, `dark`, and `saturated`.
+- **Background position**: This is designed for use with the `img-src` attribute to allow you to align your background image. Default value is `center center`.
+- **Border**: This allows the customization of a border around the entire container. There is a variable for the entire border shorthand (transparent by default) or you can hook into the individual properties. There is also a separate `border-top` property which is available to add an emphasis border at the top of the card; typically that would consist of setting the variable as follows: `--pfe-card--BorderTop: 4px solid #ee00`.
+- **Padding**: You can customize the padding around the outside of the card container by connecting to either the shortcut padding variable or just one or more of the individual padding regions. If you add a header slot to the card, note that the `padding-top` value will not be used, but rather, the `spacing--vertical` value; this is to maintain consistent padding around the text inside the card header.
+- **Spacing**: Spacing controls the internal padding for the card. There is a `spacing--vertical` property which controls spacing between regions of the card (header, body, footer) and a `spacing--horizontal` which controls spacing between items in the footer region.
+
+| Variable name | Fallback |
+| --- | --- |
+| **Display properties** |
+| `--pfe-card--AlignSelf` | stretch |
+| `--pfe-card--context` | `var(--pfe-theme--color--surface--base--context, light)` |
+| **Padding/spacing properties** |
+| `--pfe-card--PaddingTop` | `calc(--pfe-theme--container-spacer, 1rem) * 2` |
+| `--pfe-card--PaddingRight` | `calc(--pfe-theme--container-spacer, 1rem) * 2)` |
+| `--pfe-card--PaddingBottom` | `calc(--pfe-theme--container-spacer, 1rem) * 2)` |
+| `--pfe-card--PaddingLeft` | `calc(--pfe-theme--container-spacer, 1rem) * 2)` |
+| `--pfe-card--Padding` | Combination of the top, right, bottom, and left properties above |
+| `--pfe-card--region--spacing` | `var(--pfe-theme--container-spacer, 1rem)` |
+| `--pfe-card--spacing--vertical` | `var(--pfe-theme--content-spacer, 1.5rem)` |
+| `--pfe-card--spacing--horizontal` | `calc(var(--pfe-theme--content-spacer, 1.5rem) / 2)` |
+| **Border properties** |
+| `--pfe-card--BorderRadius` | `var(--pfe-theme--surface--border-radius, 3px)` |
+| `--pfe-card--BorderWidth` | 0 |
+| `--pfe-card--BorderStyle` | solid |
+| `--pfe-card--BorderColor` | var(--pfe-theme--color--surface--border, #d2d2d2) |
+| `--pfe-card--Border` | `--pfe-card--BorderWidth`, `--pfe-card--BorderStyle`, `--pfe-card--BorderColor` |
+| `--pfe-card--BorderTop` | `--pfe-card--Border` |
+| **Background properties** |
+| `--pfe-card--BackgroundColor` | `var(--pfe-theme--surface--base, #f0f0f0)` |
+| `--pfe-card--BackgroundImage` | |
+| `--pfe-card--BackgroundAttachment` | |
+| `--pfe-card--BackgroundPosition` | center center |
+| `--pfe-card--BackgroundRepeat` | |
+| `--pfe-card--BackgroundSize` | |
+| **General properties** |
+| `--pfe-card--TextAlign` | left |
+| **Overlay properties** |
+| `--pfe-card__overlay--BackgroundColor` | `rgba(0, 0, 0, var(--pfe-theme--opacity, 0.09))` |
+| **Header region properties** |
+| `--pfe-card__header--Display` | `flex` |
+| `--pfe-card__header--JustifyContent` | |
+| `--pfe-card__header--BackgroundColor` | `rgba(0, 0, 0, var(--pfe-theme--opacity, 0.09))` |
+| `--pfe-card__header--Color` | `var(--pfe-broadcasted--text, #3c3f42)` |
+| **Body region properties** |
+| `--pfe-card__body--FlexDirection` | column |
+| `--pfe-card__body--FlexWrap` | nowrap |
+| `--pfe-card__body--JustifyContent` | |
+| `--pfe-card__body--AlignItems` | |
+| **Footer region properties** |
+| `--pfe-card__footer--AlignItems` | |
+| `--pfe-card__footer--FlexDirection` | `row` |
+| `--pfe-card__footer--FlexWrap` | `wrap` |
+| `--pfe-card__footer--JustifyContent` | |
+| `--pfe-card__footer--spacing--horizontal` | `var(--pfe-theme--content-spacer, 1.5rem)` |
+
+
+### Usage notes
+
+#### Header region
+* The display property for the header region is very helpful in situations where you need to have the header content present in the DOM but want it visibly hidden from view. You can do that by setting that property to: `--pfe-card__header--Display: none`.
+* If you set the `background-color` of the header region to a color that requires a different context than the rest of the card, please be sure you update the value of the `--pfe-card__header--Color` property to use a font color that works for that `background-color`. There is no `--context` variable for this region at this time.
 
 ## Test
 

@@ -81,6 +81,15 @@
   @return str-slice($string, 1, str-length($needle)) ==$needle;
 }
 
+/// Uppercase the first letter of a string
+/// @author pascalduez
+/// @link https://gist.github.com/pascalduez/10011785
+/// @param {String} $string - string to capitalize
+/// @return {String} - Uppercase the first letter of the string
+@function str-capitalize($string) {
+    @return to-upper-case(str-slice($string, 1, 1)) + str-slice($string, 2);
+}
+  
 /// Map deep get
 /// @author Hugo Giraudel
 /// @param {Map} $map - Map

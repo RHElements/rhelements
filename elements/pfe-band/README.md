@@ -11,6 +11,10 @@ All slots other than `pfe-band--body` are optional.  If the slot is not defined,
 - `pfe-band--footer`: This slot is typically used for calls-to-action or footnotes and is pushed to the bottom of the container.  Recommended tags include `pfe-cta`. The template is automatically wrapping this slot in a `footer` tag.
 - `pfe-band--aside`: This slot is for content that should be rendered to the right or left of the default slot on desktop.  Asides often contain `pfe-card` or interest forms which provide users a little more information or context for the band. The template is automatically wrapping this slot in an `aside` tag.
 
+### Cards directly assigned to the body or aside
+
+Any card directly assigned to the body or aside region of a band and using the lightest background color (the same as the band that contains it) will automatically receive a border.
+
 ### Example markup
 ```
 <pfe-band>
@@ -87,7 +91,7 @@ The aside settings have defaults and if no attribute is defined on the element's
 There are several powerful variables available to hook into and override default styles.
 
 - **Vertical and horizontal padding**: `--pfe-band--Padding--vertical` and `--pfe-band--Padding--horizontal` accept size values such as px, em, rem, etc.
-- **Background color**: Though using the `pfe-color` attribute is strongly recommended when setting the background color for the band, you can also use completely custom colors by updating the `--pfe-band--BackgroundColor` variable.  If you update this value manually, you should also update the `--context` context variable to invoke the right context on it and it's child elements.  Supported contexts include: `light`, `dark`, and `saturated`.
+- **Background color**: Though using the `color` attribute is strongly recommended when setting the background color for the band, you can also use completely custom colors by updating the `--pfe-band--BackgroundColor` variable.  If you update this value manually, you should also update the `--context` context variable to invoke the right context on it and it's child elements.  Supported contexts include: `light`, `dark`, and `saturated`.
 - **Background position**: This is designed for use with the `pfe-img-src` attribute to allow you to align your background image.  Default value is `center center`.
 - **Border**: This allows the customization of a border around the entire container and is primarily designed to be used to add a top and/or bottom border line.  This variable accepts the entire border shorthand and is set to transparent by default.
 - **Layout**: The band has a rudimentary layout system designed to be used inside the slot regions for the header, body, footer, and aside (see `use-grid` attribute details above). The regions themselves are also wrapped in a grid system that supports customization. All layouts appears "stacked" by default. Please note that the fallback for older browsers is a simple stacked layout (the aside position will be aligned using floats). Possible values include: `1fr 1fr`, `repeat(3, 1fr)`, `repeat(auto-fill, minmax(300px, 1fr))`. i.e., `--pfe-band--layout: repeat(auto-fill, minmax(300px, 1fr));`.

@@ -118,16 +118,31 @@ class PfeCard extends PFElement {
 
   constructor() {
     super(PfeCard, { type: PfeCard.PfeType });
+
+    this._colorChanged = this._colorChanged.bind(this);
+    this._imageSrcChanged = this._imageSrcChanged.bind(this);
+  }
+
+  connectedCallback() {
+    super.connectedCallback();
+
+    // If the general padding property is set, split it out and set it on the card
+    // Why? Padding needs to be used distinctly in each region, separate from each other
+    this.getExplicitProps("padding", ["padding-top", "padding-right", "padding-bottom", "padding-left"]);
   }
 
   // If the color changes, update the context
-  _colorChanged() {
+  _colorChanged(oldValue, newValue) {
+    if (oldValue === newValue) return;
+
     // Update the context
     this.resetContext();
   }
 
   // Update the background image
   _imageSrcChanged(oldValue, newValue) {
+    if (oldValue === newValue) return;
+
     // Set the image as the background image
     this.style.backgroundImage = newValue ? `url('${newValue}')` : ``;
   }

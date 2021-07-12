@@ -3,44 +3,79 @@
 $LOCAL: card;
 
 $LOCAL-VARIABLES: (
+  // These get applied to each region
+  TextAlign: left,
+  
+  // This only applies when the card is inside a flex layout
+  AlignSelf: stretch,
+  
   // Individual padding overrides available
   PaddingTop: calc(#{pfe-var(container-spacer)} * 2),
   PaddingRight: calc(#{pfe-var(container-spacer)} * 2),
   PaddingBottom: calc(#{pfe-var(container-spacer)} * 2),
   PaddingLeft: calc(#{pfe-var(container-spacer)} * 2),
 
+  // Space between header, body, footer regions
+  region--spacing: pfe-var(container-spacer),
+
+  // Spacing internal to regions
+  spacing--horizontal: calc(#{pfe-var(content-spacer)} / 2),
+  spacing--vertical:   pfe-var(content-spacer),
+  
   //-- Border settings
+  BorderWidth: 0,
+  BorderStyle: solid,
+  BorderColor: pfe-var(surface--border),
   BorderRadius: pfe-var(surface--border-radius),
 
   //-- Color properties
   BackgroundColor: pfe-var(surface--base),
+  // BackgroundImage: null,
+  // BackgroundAttachment: null,
   context: pfe-var(surface--base--context),
   BackgroundPosition: center center,
-
-  spacing: pfe-var(container-spacer),
-
+  // BackgroundRepeat: null,
+  // BackgroundSize: null,
+  
   header: (
+    Display: flex,
+    JustifyContent: null,
+    Color: pfe-broadcasted(text),
     BackgroundColor: rgba(0, 0, 0, pfe-var(opacity)),
-    BackgroundColor--dark: rgba(255, 255, 255, pfe-var(opacity)),
-    Color:           pfe-broadcasted(text)
+    BackgroundColor--dark: rgba(255, 255, 255, pfe-var(opacity))
+  ),
+
+  body: (
+    FlexDirection: column,
+    FlexWrap: nowrap,
+    JustifyContent: null,
+    AlignItems: null
   ),
 
   footer: (
-    spacing--horizontal: calc(#{pfe-var(container-spacer)} / 2)
-  )
+    FlexDirection: row,
+    FlexWrap: wrap,
+    JustifyContent: null,
+    AlignItems: null,
+    spacing--horizontal: pfe-var(content-spacer)
+  ),
 
+  overlay: (
+    BackgroundColor: rgba(0, 0, 0, #{pfe-var(opacity)})
+  )
 );
 
 // Nested internal variables (pfe-local calls), maps cannot "self-reference"
 $LOCAL-VARIABLES: map-deep-merge($LOCAL-VARIABLES, (
-  // Internal spacing; elements inside the card (header, body, footer regions)
-  spacing--vertical: pfe-local(spacing),
-
   // Combine above variables or allow single override point via variable
   Padding: pfe-local(PaddingTop) pfe-local(PaddingRight) pfe-local(PaddingBottom) pfe-local(PaddingLeft),
 
   //-- Border variable encompasses width, style, and color
-  Border: pfe-local(BorderWidth, 0) pfe-local(BorderStyle, solid) pfe-local(BorderColor, pfe-var(surface--border))
+  Border: pfe-local(BorderWidth) pfe-local(BorderStyle) pfe-local(BorderColor)
+));
+  
+$LOCAL-VARIABLES: map-deep-merge($LOCAL-VARIABLES, (
+  BorderTop: pfe-local(Border)
 ));
 
 $size-small: (
@@ -50,32 +85,37 @@ $size-small: (
   PaddingLeft:    pfe-var(container-spacer)
 );
 
-
 :host {
   --context: #{pfe-local(context)};
 
-  // Start of style declarations for host element
   display: flex;
   flex-direction: column;
   justify-items: flex-start;
+  flex-wrap: nowrap;
+
   // This allows the card to fill it's container if necessary
-  align-self: stretch;
+  align-self:       pfe-local(AlignSelf);
+  position:         relative;
 
   padding:       pfe-local(Padding);
-  border:        pfe-local(Border);  // @TODO add automatic border when lightest card is on lightest background?
+
+  border:        pfe-local(Border); // @TODO add automatic border when lightest card is on lightest background?
+  border-top:    pfe-local(BorderTop);
   border-radius: pfe-local(BorderRadius);
 
   // This property ensures that children in the slots do no overflow
   // the border-radius being set on the container
   overflow: hidden;
+  position: relative;
 
   // Base colors
+  background-image:    pfe-local(BackgroundImage);
   background-color:    pfe-local(BackgroundColor);
   background-position: pfe-local(BackgroundPosition);
+  background-repeat:   pfe-local(BackgroundRepeat);
+  background-size:     pfe-local(BackgroundSize);
+  background-attachment:  pfe-local(BackgroundAttachment);
   color: pfe-broadcasted(text);
-
-  // Remove background color for print
-  @include pfe-no-print-background;
 
   // Add the border to the card for print
   @include pfe-print-media {
@@ -83,13 +123,16 @@ $size-small: (
     border: pfe-fetch(surface--border-width) pfe-fetch(surface--border-style) pfe-fetch(surface--border);
   }
 
+  // Remove background color for print
+  @include pfe-no-print-background;
+
   @include browser-query(ie11) {
     background-color: pfe-var(surface--lightest) !important;
     color: pfe-var(text) !important;
     background-image: none !important;
     border-radius: pfe-fetch(surface--border-radius);
     border: pfe-fetch(surface--border-width) pfe-fetch(surface--border-style) pfe-fetch(surface--border);
-    padding: pfe-var(container-spacer);
+    padding: pfe-fetch(container-spacer);
   }
 }
 
@@ -103,7 +146,17 @@ $size-small: (
 }
 
 :host([border]:not([border="false"])) {
-  --pfe-card--BorderWidth:   #{pfe-fetch(surface--border-width)};
+  border-width:   pfe-var(surface--border-width);
+}
+
+:host([overlay]) .pfe-card__overlay {
+  @extend %overlay;
+  background-color: pfe-local(BackgroundColor, $region: overlay);
+  z-index: 0;
+
+  @include pfe-print-media {
+    display: none;
+  }
 }
 
 // Targets the wrappers in the shadow DOM
@@ -111,9 +164,11 @@ $size-small: (
   &__header,
   &__body,
   &__footer {
+    z-index: 1;
+    text-align: pfe-local(TextAlign);
+
     ::slotted([pfe-overflow~="top"]),
     ::slotted([overflow~="top"]) {
-      z-index: 1;
       margin-top: -2rem; //IE11 fallback
       margin-top: calc(-1 * #{pfe-local(PaddingTop)}) !important;
       :host([has_header]) & {
@@ -125,6 +180,9 @@ $size-small: (
     ::slotted([overflow~="right"]) {
       margin-right: -2rem; //IE11 fallback
       margin-right: calc(-1 * #{pfe-local(PaddingRight)});
+
+      max-width: calc(100% + 2rem); //IE11 fallback
+      max-width: calc(100% + #{pfe-local(PaddingRight)});
     }
 
     ::slotted([pfe-overflow~="bottom"]),
@@ -138,12 +196,9 @@ $size-small: (
     ::slotted([overflow~="left"]) {
       margin-left: -2rem; //IE11 fallback
       margin-left: calc(-1 * #{pfe-local(PaddingLeft)});
-    }
 
-    ::slotted(img) {
-      max-width: 100% !important;
-      align-self: flex-start; //Don't stretch image 100% with other Flexbox items in card.
-      object-fit: cover; // Fix distortion
+      max-width: calc(100% + 2rem); //IE11 fallback
+      max-width: calc(100% + #{pfe-local(PaddingLeft)});
     }
 
     ::slotted(img:not[pfe-overflow]),
@@ -154,6 +209,7 @@ $size-small: (
     ::slotted(img[pfe-overflow]),
     ::slotted(img[overflow]) {
       max-width: unset !important;
+      object-fit: cover; // Fix distortion
     }
 
     ::slotted(img[pfe-overflow~="right"]),
@@ -173,100 +229,134 @@ $size-small: (
       width: calc(100% + 4rem) !important; //IE11 fallback
       width: calc(100% + #{pfe-local(PaddingRight)} + #{pfe-local(PaddingLeft)}) !important;
     }
+    
+    // Target the last item in the slot, injected using JS on upgrade
+    ::slotted([last]:not(img[overflow~="bottom"])) {
+      margin-bottom: 0;
+    }
   }
   &__header {
+    @include pfe-clear-spacing($properties: margin-bottom, $important: true);
+
+    display:     pfe-local(Display, $region: header);
+    flex-direction: row;
+    flex-wrap: nowrap;
+    justify-content: pfe-local(JustifyContent, $region: header);
     z-index: 2;
+    
     // Declare the header background color
     background-color: pfe-local(BackgroundColor, $region: header);
-    color:            pfe-local($cssvar: Color, $region: header);
+    color:            pfe-local(Color, $region: header);
+
     :host([on="dark"]) & {
         // Declare the header background color
       background-color: pfe-local(BackgroundColor--dark, $region: header);
     }
+
     @include browser-query(ie11) {
       background-color: pfe-fetch(surface--lightest) !important;
       color: pfe-fetch(text) !important;
     }
 
-    // Margin styles on header region
-    margin-top:    calc(#{pfe-local(PaddingTop)} * -1) !important;
-    margin-right:  calc(#{pfe-local(PaddingRight)} * -1);
-    margin-bottom: pfe-local(spacing--vertical);
-    margin-left:   calc(#{pfe-local(PaddingLeft)} * -1);
-
     // Padding for the header region
-    padding-top:    pfe-local(spacing--vertical);
+    padding-top:    calc(#{pfe-local(spacing--vertical)} / 2);
     padding-right:  pfe-local(PaddingRight);
+    padding-bottom: calc(#{pfe-local(spacing--vertical)} / 2);
     padding-left:   pfe-local(PaddingLeft);
-    padding-bottom: pfe-local(spacing--vertical);
 
-    :host(:not([has_body],[has_footer])) & {
-      margin-bottom: pfe-local(PaddingBottom);
+    margin-top: calc(-1 * #{pfe-local(PaddingTop)});
+    margin-bottom: pfe-local(region--spacing);
+    margin-right: calc(#{pfe-local(PaddingRight)} * -1);
+    margin-left: calc(#{pfe-local(PaddingLeft)} * -1);
+
+    ::slotted(*:not([last])) {
+      margin-right: pfe-local(spacing--horizontal);
     }
 
     ::slotted([pfe-overflow~="top"]),
     ::slotted([overflow~="top"]) {
-      --pfe-card__overflow--MarginTop: calc(#{pfe-local(PaddingTop)} * -1);
+      margin-top: -2rem; //IE11 fallback
+      margin-top: calc(-1 * #{pfe-local(spacing--vertical)});
     }
 
     :host(:not([has_header])) & {
       display: none;
     }
 
-    :host([has_body],[has_footer]) & ::slotted([pfe-overflow~="bottom"]),
-    :host([has_body],[has_footer]) & ::slotted([overflow~="bottom"]) {
-      --pfe-card__overflow--MarginBottom: calc(#{pfe-local(spacing--vertical)} * -1);
+    :host([has_default],[has_footer]) & ::slotted([pfe-overflow~="bottom"]),
+    :host([has_default],[has_footer]) & ::slotted([overflow~="bottom"]) {
+      margin-bottom: pfe-local(MarginBottom, $region: overflow, $fallback: calc(#{pfe-local(spacing--vertical)} * -1));
     }
 
     ::slotted([pfe-overflow~="bottom"]),
     ::slotted([overflow~="bottom"]) {
-      --pfe-card__overflow--MarginBottom: calc(#{pfe-local(PaddingBottom)} * -1);
+      margin-bottom: -2rem; //IE11 fallback
+      margin-bottom: calc(-1 * #{pfe-local(spacing--vertical)});
     }
 
-    @each $tag in (h1, h2, h3, h4, h5, h6) {
-      ::slotted(#{$tag}) {
-        margin-bottom: 0;
-      }
+    :host(:not([has_header])) & {
+      display: none;
     }
   }
   &__body {
-    :host(:not([has_header])) & ::slotted([pfe-overflow~="top"]),
+    flex-grow: 1;
+
+    // Start of style declarations for host element
+    display: flex;
+    flex-direction: pfe-local(FlexDirection, $region: body);
+    flex-wrap:      pfe-local(FlexWrap, $region: body);
+  
+    // Optional hooks, no default styles
+    justify-content:  pfe-local(JustifyContent, $region: body);
+    align-items:      pfe-local(AlignItems, $region: body);
+
+    :host([has_footer]) & {
+      margin-bottom: pfe-local(region--spacing);
+    }
+
+    ::slotted(*:not([last])) {
+      margin-bottom: pfe-local(spacing--vertical);
+    }
+
     :host(:not([has_header])) & ::slotted([overflow~="top"]) {
-      --pfe-card__overflow--MarginTop: calc(#{pfe-local(PaddingTop)} * -1);
-    }
-
-    ::slotted([pfe-overflow~="top"]),
-    ::slotted([overflow~="top"]) {
-      z-index: 1;
-      --pfe-card__overflow--MarginTop: calc(#{pfe-local(spacing--vertical)} * -1);
-    }
-
-    ::slotted([pfe-overflow~="bottom"]),
-    ::slotted([overflow~="bottom"]) {
-      --pfe-card__overflow--MarginBottom: calc(#{pfe-local(PaddingBottom)} * -1);
+      margin-top: pfe-local(MarginTop, $region: overflow, $fallback: calc(#{pfe-local(PaddingTop)} * -1));
     }
 
     :host([has_footer]) & ::slotted([pfe-overflow~="bottom"]),
     :host([has_footer]) & ::slotted([overflow~="bottom"]) {
-      --pfe-card__overflow--MarginBottom: calc(#{pfe-local(spacing--vertical)} * -1);
+      margin-bottom: pfe-local(MarginBottom, $region: overflow, $fallback: calc(#{pfe-local(spacing--vertical)} * -1));
     }
-
+    
     :host(:not([has_footer])) & {
       margin-bottom: 0;
     }
   }
   &__footer {
-    margin-top: auto; // This allows the footer to move to the very bottom
+    @include pfe-clear-spacing($properties: margin-bottom, $important: true, $selector: last-child);
+
+    z-index: 1;
+    // margin-top: auto; // This allows the footer to move to the very bottom
 
     display: flex;
     flex-direction: pfe-local(Row, row, $region: footer);
     flex-wrap:      pfe-local(Wrap, wrap, $region: footer);
     // Aligns buttons and CTAs
     align-items: pfe-local(AlignItems, baseline, $region: footer);
+    gap: pfe-local(spacing--horizontal, $region: footer);
+
+    :host(:not([has_footer])) & {
+      display: none;
+    }
+
+    ::slotted([overflow~="top"]) {
+      margin-top: -2rem; //IE11 fallback
+      margin-top: calc(-1 * #{pfe-local(region--spacing)});
+    }
 
     ::slotted([pfe-overflow~="bottom"]),
     ::slotted([overflow~="bottom"]) {
-      --pfe-card__overflow--MarginBottom: calc(#{pfe-local(PaddingBottom)} * -1);
+      margin-bottom: -2rem; //IE11 fallback
+      margin-bottom: calc(-1 * #{pfe-local(PaddingBottom)});
     }
 
     :host(:not([has_footer])) & {
@@ -285,5 +375,11 @@ $size-small: (
         margin-top: 0;
       }
     }
+  }
+}
+
+@include browser-query(ie11) {
+  img[overflow] {
+      max-width: 100%;
   }
 }

@@ -35,7 +35,7 @@ const template = (data = {}) => {
 stories.addDecorator(storybookBridge.withKnobs({ escapeHTML: false }));
 
 const defaultHeading = tools.autoHeading(true);
-const defaultBody = tools.autoContent(1, 2);
+const defaultBody = tools.autoContent(1, 1);
 
 stories.add(PfeCard.tag, () => {
   let config = {};
@@ -62,6 +62,7 @@ stories.add(PfeCard.tag, () => {
   let ctaValue;
   let image = "";
   let region = "body";
+  let footer;
 
   // If they do, prompt them for the image properties
   if (imageValue) {
@@ -89,6 +90,7 @@ stories.add(PfeCard.tag, () => {
         overflowAttr.push("bottom");
         overflowAttr.push("left");
         region = "footer";
+        delete slots.footer;
         break;
       case "sides":
         overflowAttr.push("right");
@@ -134,7 +136,8 @@ stories.add(PfeCard.tag, () => {
 
     if (ctaValue) {
       // If the link exists, add the default value for the footer slot
-      slots.footer.default = tools.component("pfe-cta", footerAttrs, [
+      delete slots.footer;
+      footer = tools.component("pfe-cta", footerAttrs, [
         {
           content: `<a href="${ctaLink}">${ctaText}</a>`,
         },
@@ -166,7 +169,7 @@ stories.add(PfeCard.tag, () => {
   if (ctaValue && config.has.footer.length > 0) {
     config.slots.push({
       slot: "pfe-card--footer",
-      content: region === "footer" ? image : config.has.footer,
+      content: region === "footer" ? image : footer ? footer : config.has.footer ? config.has.footer : "",
     });
   }
 
