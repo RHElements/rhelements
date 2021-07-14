@@ -9,10 +9,6 @@ tags:
   - component
 ---
 
-::: section header
-# {{ title }}
-:::
-
 ::: section
 ## Overview
 
@@ -48,6 +44,8 @@ npm install @patternfly/{{ package }}
 ```html
 <pfe-avatar name="Eleanore Stillwagon"></pfe-avatar>
 ```
+
+<pfe-cta><a href="../../elements/{{ package }}/demo">Demo</a></pfe-cta>
 :::
 
 ::: section

@@ -5,27 +5,11 @@ const compress = require("compression");
 const markdownIt = require("markdown-it");
 const markdownItAnchor = require("markdown-it-anchor");
 const markdownItContainer = require("markdown-it-container");
+const markdownItAttrs = require("markdown-it-attrs");
 
 module.exports = function (eleventyConfig) {
   eleventyConfig.setQuietMode(process.env.npm_config_quiet);
   eleventyConfig.setWatchThrottleWaitTime(500);
-
-  eleventyConfig.addFilter('dump', obj => {
-    const getCircularReplacer = () => {
-      const seen = new WeakSet();
-      return (key, value) => {
-        if (typeof value === "object" && value !== null) {
-          if (seen.has(value)) {
-            return;
-          }
-          seen.add(value);
-        }
-        return value;
-      };
-    };
-  
-    return JSON.stringify(obj, getCircularReplacer(), 4);
-  });
 
   /**
    * Collections to organize by alphabetical instead of date
@@ -75,7 +59,6 @@ module.exports = function (eleventyConfig) {
   eleventyConfig.addPassthroughCopy("./elements/*/*.{jpg,png,svg}");
 
   eleventyConfig.addPassthroughCopy("./brand");
-  eleventyConfig.addPassthroughCopy("./storybook");
 
   // Check if the components folder needs to be created
   if(!fs.existsSync(`docs/components/`)) {
@@ -110,29 +93,31 @@ module.exports = function (eleventyConfig) {
   //   "./elements/pfe-styles/demo": "theming/pfe-styles"
   // });
 
-  let options = {
-    html: true
-  };
-
-  let markdownLib = markdownIt(options);
+  let markdownLib = markdownIt({
+    html: true,
+    linkify: true,
+    highlight: (str, lang) => {
+      if (lang) return `<pfe-codeblock code-language="${lang}"><pre codeblock-container><code editable>${markdownLib.utils.escapeHtml(str)}</code></pre></pfe-codeblock>`
+      else return `<pre class="hljs"><code>${markdownLib.utils.escapeHtml(str)}</code></pre>`;
+    }
+  }).disable(["code"]);
   markdownLib.use(markdownItAnchor);
+  markdownLib.use(markdownItAttrs);
+
   markdownLib.use(markdownItContainer, "section", {
     validate: params => {
       return params.trim().match(/^section+(.*)$/);
     },
     render: (tokens, idx) => {
-      let m = tokens[idx].info.trim().match(/^section+(.*)$/);
-      let color = m && m[1].trim() === "header" ? "" : "lightest";
-      let size = m && m[1].trim() === "header" ? "" : "small";
-      let classes = m && m[1].trim() === "header" ? `class="header"` : "";
-
+      // let m = tokens[idx].info.trim().match(/^section+(.*)$/);
       if (tokens[idx].nesting === 1) {
-        return `<pfe-band ${size ? `size="${size}"` : ""} color="${color}"${classes} use-grid>`
+        return `<div class="section pfe-c-content">`
       } else {
-        return `</pfe-band>\n`;
+        return `</div>\n`;
       }
     }
   });
+
 
   eleventyConfig.setLibrary("md", markdownLib);
 
