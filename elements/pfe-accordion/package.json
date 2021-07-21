@@ -4,9 +4,7 @@
     "className": "PfeAccordion",
     "elementName": "pfe-accordion",
     "assets": [
-      "pfe-accordion.js",
-      "pfe-accordion-header.js",
-      "pfe-accordion-panel.js"
+      "pfe-accordion.js"
     ],
     "preview": "accordion.svg"
   },
@@ -17,7 +15,9 @@
   "description": "Accordion for PatternFly Elements",
   "keywords": [
     "web-components",
-    "html"
+    "html",
+    "disclosure",
+    "accordion"
   ],
   "repository": {
     "type": "git",
@@ -56,6 +56,10 @@
     },
     {
       "name": "Kendall Totten"
+    },
+    {
+      "name": "castastrophe",
+      "url": "https://github.com/castastrophe"
     }
   ],
   "license": "MIT",
@@ -63,7 +67,8 @@
     "@patternfly/pfe-sass": "^1.10.1"
   },
   "dependencies": {
-    "@patternfly/pfelement": "^1.10.1"
+    "@patternfly/pfe-collapse": "^1.10.1",
+    "@patternfly/pfe-icon": "^1.10.1"
   },
   "generator-pfelement-version": "0.5.5",
   "bugs": {
